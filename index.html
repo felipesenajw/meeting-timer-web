@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Timer para Reuniões</title>
+    
+    <link rel="icon" type="image/png" href="https://cdn.jsdelivr.net/gh/felipesenajw/meeting-timer-web@main/icon.png">
+    <link rel="apple-touch-icon" href="https://cdn.jsdelivr.net/gh/felipesenajw/meeting-timer-web@main/icon.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Timer Reunião">
+    <meta name="theme-color" content="#5a3d8d">
+
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+
+    <style>
+        :root {
+            --primary-color: #5a3d8d;
+            --tesouros: #2a6d7a;
+            --ministerio: #b38f00;
+            --vida-crista: #9e2a2b;
+            --danger-color: #dc3545;
+            --warning-color: #ffc107;
+            --success-color: #28a745;
+            --bg-color: #f0f2f5;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --border-color: #dddddd;
+            --whatsapp-color: #25D366;
+            --nav-bg: #ffffff;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-color: #e0e0e0;
+            --border-color: #333333;
+            --nav-bg: #1e1e1e;
+            --primary-color: #a584e0;
+        }
+
+        * { font-family: 'Ubuntu', sans-serif; -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+
+        body { background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 10px; padding-bottom: 140px; transition: 0.3s; overflow-x: hidden; }
+        .container { max-width: 500px; margin: auto; background: var(--card-bg); padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        
+        .header-box { text-align: center; margin-bottom: 15px; }
+        h2 { color: var(--primary-color); margin: 0; font-size: 1.5rem; font-weight: 700; }
+
+        .tabs { display: flex; border-radius: 8px; overflow: hidden; margin-bottom: 15px; border: 1px solid var(--primary-color); }
+        .tab { flex: 1; padding: 12px; text-align: center; cursor: pointer; background: transparent; font-weight: 500; font-size: 0.9rem; border: none; color: var(--text-color); }
+        .tab.active { background: var(--primary-color); color: white; }
+
+        .content { display: none; }
+        .content.active { display: block; }
+
+        .accordion { margin-bottom: 10px; border-radius: 8px; overflow: hidden; border: 1px solid var(--border-color); }
+        .accordion-header { padding: 12px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; color: white; font-weight: 500; font-size: 0.85rem; letter-spacing: 0.5px; }
+        .accordion-content { display: none; padding: 10px; background: var(--card-bg); min-height: 20px; }
+        .accordion-content.open { display: block; }
+
+        .bg-tesouros { background-color: var(--tesouros); }
+        .bg-ministerio { background-color: var(--ministerio); }
+        .bg-vida-crista { background-color: var(--vida-crista); }
+
+        .part-card { background: var(--card-bg); border: 1px solid var(--border-color); padding: 12px; border-radius: 8px; margin-bottom: 8px; border-left: 5px solid #ccc; position: relative; transition: background-color 0.4s, border-color 0.4s; }
+        .color-tesouros { border-left-color: var(--tesouros); }
+        .color-ministerio { border-left-color: var(--ministerio); }
+        .color-vida-crista { border-left-color: var(--vida-crista); }
+        .color-fim { border-left-color: var(--primary-color); }
+
+        /* Estados de Alerta Visual */
+        .alert-warning { background-color: rgba(255, 193, 7, 0.15) !important; border-color: var(--warning-color) !important; }
+        .alert-danger { background-color: rgba(220, 53, 69, 0.15) !important; border-color: var(--danger-color) !important; }
+
+        .part-info { display: flex; justify-content: space-between; align-items: center; pointer-events: none; }
+        .part-name { font-weight: 500; font-size: 1rem; }
+        .meta-text { font-size: 0.75rem; color: #888; font-weight: 700; }
+        
+        .timer-row { display: flex; justify-content: space-between; align-items: center; margin-top: 5px; }
+        .timer-display { font-size: 2rem; font-weight: 700; cursor: pointer; }
+        .text-danger { color: var(--danger-color); animation: blink 1s infinite; }
+        .text-warning { color: #d39e00; }
+        [data-theme="dark"] .text-warning { color: var(--warning-color); }
+
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+        .controls { display: flex; gap: 8px; }
+        .icon-btn { border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; color: white; }
+        .btn-play { background: var(--success-color); }
+        .btn-pause { background: var(--danger-color); }
+        .btn-reset { background: #6c757d; }
+        
+        .btn-config-action { width: 28px; height: 28px; position: absolute; display: none; z-index: 10; border-radius: 50%; border: none; color: white; cursor: pointer; align-items: center; justify-content: center; }
+        .btn-delete { background: #333; top: -10px; right: -10px; }
+        .btn-edit { background: var(--primary-color); top: -10px; right: 25px; }
+
+        .drag-handle { display: none; margin-right: 10px; color: #888; }
+        .config-mode .drag-handle { display: block; }
+        .config-mode .part-card { cursor: move; touch-action: none; }
+        .config-mode .btn-config-action { display: flex; }
+        .config-mode .timer-row { opacity: 0.3; pointer-events: none; }
+
+        .btn-add { width: 100%; padding: 10px; margin-top: 5px; border: 2px dashed #666; border-radius: 8px; background: transparent; display: none; font-weight: 500; color: var(--text-color); cursor: pointer; }
+        .config-mode .btn-add { display: block; }
+
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--nav-bg); border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; align-items: center; padding: 10px 0; z-index: 100; padding-bottom: env(safe-area-inset-bottom); }
+        .nav-item { background: none; border: none; color: var(--text-color); cursor: pointer; display: flex; flex-direction: column; align-items: center; font-size: 0.75rem; font-weight: 500; }
+        .nav-item .material-icons { font-size: 24px; margin-bottom: 2px; }
+
+        .btn-whatsapp { position: fixed; bottom: 85px; right: 20px; background: var(--whatsapp-color); color: white; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); border: none; z-index: 99; }
+
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; justify-content: center; align-items: center; }
+        .modal { background: var(--card-bg); color: var(--text-color); padding: 20px; border-radius: 15px; width: 85%; max-width: 350px; }
+        .modal h3 { font-weight: 700; margin-top: 0; text-align: center; }
+        .modal input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; background: var(--bg-color); color: var(--text-color); font-size: 1rem; }
+        .modal-footer { display: flex; justify-content: space-between; margin-top: 20px; gap: 10px; }
+        .modal-btn { flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; }
+
+        .history-item { border-bottom: 1px solid var(--border-color); padding: 10px 0; text-align: left; font-size: 0.85rem; line-height: 1.4; }
+    </style>
+</head>
+<body id="body">
+
+<div class="container">
+    <div class="header-box">
+        <h2>Timer para Reuniões</h2>
+    </div>
+
+    <div class="tabs">
+        <button class="tab active" onclick="switchTab('meio')">Meio de Semana</button>
+        <button class="tab" onclick="switchTab('fim')">Fim de Semana</button>
+    </div>
+
+    <div id="meio" class="content active">
+        <div class="accordion">
+            <div class="accordion-header bg-tesouros" onclick="toggleAccordion('acc-tesouros', this)">
+                <span>TESOUROS DA PALAVRA</span>
+                <span class="material-icons acc-icon">expand_less</span>
+            </div>
+            <div id="acc-tesouros" class="accordion-content open sortable-list" data-container="acc-tesouros"></div>
+            <button class="btn-add" onclick="openAddModal('acc-tesouros', 'color-tesouros')">+ Adicionar Parte</button>
+        </div>
+        <div class="accordion">
+            <div class="accordion-header bg-ministerio" onclick="toggleAccordion('acc-ministerio', this)">
+                <span>FAÇA SEU MELHOR</span>
+                <span class="material-icons acc-icon">expand_more</span>
+            </div>
+            <div id="acc-ministerio" class="accordion-content sortable-list" data-container="acc-ministerio"></div>
+            <button class="btn-add" onclick="openAddModal('acc-ministerio', 'color-ministerio')">+ Adicionar Parte</button>
+        </div>
+        <div class="accordion">
+            <div class="accordion-header bg-vida-crista" onclick="toggleAccordion('acc-vida', this)">
+                <span>NOSSA VIDA CRISTÃ</span>
+                <span class="material-icons acc-icon">expand_more</span>
+            </div>
+            <div id="acc-vida" class="accordion-content sortable-list" data-container="acc-vida"></div>
+            <button class="btn-add" onclick="openAddModal('acc-vida', 'color-vida-crista')">+ Adicionar Parte</button>
+        </div>
+    </div>
+
+    <div id="fim" class="content">
+        <div id="list-fim" class="sortable-list" data-container="list-fim"></div>
+        <button class="btn-add" onclick="openAddModal('list-fim', 'color-fim')">+ Adicionar Parte</button>
+    </div>
+</div>
+
+<button class="btn-whatsapp" onclick="sendWhatsApp()"><span class="material-icons" style="font-size:30px">share</span></button>
+
+<nav class="bottom-nav">
+    <button class="nav-item" onclick="openHistory()">
+        <span class="material-icons">history</span>
+        <span>Histórico</span>
+    </button>
+    <button class="nav-item" onclick="toggleTheme()">
+        <span class="material-icons" id="theme-icon">dark_mode</span>
+        <span>Tema</span>
+    </button>
+    <button class="nav-item" onclick="toggleConfigMode()">
+        <span class="material-icons" id="config-icon">settings</span>
+        <span id="config-text">Configurar</span>
+    </button>
+</nav>
+
+<div id="customModal" class="modal-overlay">
+    <div class="modal">
+        <h3 id="modalTitle">Título</h3>
+        <div id="modalBody"></div>
+        <div class="modal-footer">
+            <button class="modal-btn" style="background:#666; color:white" onclick="closeModal()">Cancelar</button>
+            <button class="modal-btn" style="background:var(--primary-color); color:white" id="modalConfirmBtn">Confirmar</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const defaultParts = [
+        { id: "p1", nome: "Tesouros da Palavra", meta: 10, container: "acc-tesouros", cor: "color-tesouros" },
+        { id: "p2", nome: "Joias Espirituais", meta: 10, container: "acc-tesouros", cor: "color-tesouros" },
+        { id: "p3", nome: "Leitura da Bíblia", meta: 4, container: "acc-tesouros", cor: "color-tesouros" },
+        { id: "p4", nome: "Faça seu Melhor", meta: 15, container: "acc-ministerio", cor: "color-ministerio" },
+        { id: "p5", nome: "Nossa Vida Cristã", meta: 15, container: "acc-vida", cor: "color-vida-crista" },
+        { id: "p6", nome: "Estudo Bíblico", meta: 30, container: "acc-vida", cor: "color-vida-crista" },
+        { id: "p7", nome: "Discurso Público", meta: 30, container: "list-fim", cor: "color-fim" },
+        { id: "p8", nome: "Estudo de A Sentinela", meta: 60, container: "list-fim", cor: "color-fim" }
+    ];
+
+    let meetingParts = JSON.parse(localStorage.getItem('jw_parts_v15')) || defaultParts;
+    let timers = JSON.parse(localStorage.getItem('jw_timers_v15')) || {};
+    let history = JSON.parse(localStorage.getItem('jw_history_v15')) || [];
+    let currentTheme = localStorage.getItem('jw_theme') || 'light';
+    let sortables = [];
+
+    function initTheme() {
+        document.documentElement.setAttribute('data-theme', currentTheme);
+        document.getElementById('theme-icon').innerText = currentTheme === 'light' ? 'dark_mode' : 'light_mode';
+    }
+
+    function toggleTheme() {
+        currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+        localStorage.setItem('jw_theme', currentTheme);
+        initTheme();
+    }
+
+    function render() {
+        document.querySelectorAll('.sortable-list').forEach(c => c.innerHTML = "");
+        meetingParts.forEach(p => {
+            if (!timers[p.id]) timers[p.id] = { sec: 0, running: false };
+            const container = document.querySelector(`[data-container="${p.container}"]`);
+            if(!container) return;
+
+            container.innerHTML += `
+                <div class="part-card ${p.cor}" id="${p.id}" data-id="${p.id}">
+                    <button class="btn-config-action btn-delete" onclick="confirmDelete('${p.id}')"><span class="material-icons" style="font-size:16px">delete</span></button>
+                    <button class="btn-config-action btn-edit" onclick="openEditModal('${p.id}')"><span class="material-icons" style="font-size:16px">edit</span></button>
+                    <div class="part-info">
+                        <div style="display:flex; align-items:center;">
+                            <span class="material-icons drag-handle">drag_indicator</span>
+                            <span class="part-name">${p.nome}</span>
+                        </div>
+                        <span class="meta-text">${p.meta} min</span>
+                    </div>
+                    <div class="timer-row">
+                        <div class="timer-display" id="disp-${p.id}" onclick="openAdjustModal('${p.id}')">00:00</div>
+                        <div class="controls">
+                            <button id="btn-${p.id}" class="icon-btn ${timers[p.id].running ? 'btn-pause' : 'btn-play'}" onclick="toggleTimer('${p.id}')">
+                                <span class="material-icons">${timers[p.id].running ? 'pause' : 'play_arrow'}</span>
+                            </button>
+                            <button class="icon-btn btn-reset" onclick="confirmReset('${p.id}')"><span class="material-icons">replay</span></button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            updateDisplay(p.id);
+        });
+        initDragAndDrop();
+    }
+
+    function updateDisplay(id) {
+        const el = document.getElementById(`disp-${id}`);
+        const card = document.getElementById(id);
+        if(!el || !card) return;
+        const p = meetingParts.find(x => x.id === id);
+        const sec = timers[id].sec;
+        const metaSec = p.meta * 60;
+        const m = Math.floor(sec / 60).toString().padStart(2,'0');
+        const s = (sec % 60).toString().padStart(2,'0');
+        el.innerText = `${m}:${s}`;
+
+        card.classList.remove('alert-warning', 'alert-danger');
+        el.classList.remove('text-warning', 'text-danger');
+
+        if (sec > metaSec) {
+            card.classList.add('alert-danger'); el.classList.add('text-danger');
+        } else if (sec >= (metaSec - 60) && sec > 0) {
+            card.classList.add('alert-warning'); el.classList.add('text-warning');
+        }
+    }
+
+    function initDragAndDrop() {
+        sortables.forEach(s => s.destroy()); sortables = [];
+        const isConfig = document.getElementById('body').classList.contains('config-mode');
+        document.querySelectorAll('.sortable-list').forEach(el => {
+            const s = Sortable.create(el, { animation: 150, handle: '.part-card', disabled: !isConfig, onEnd: saveNewOrder });
+            sortables.push(s);
+        });
+    }
+
+    function saveNewOrder() {
+        const newOrder = [];
+        document.querySelectorAll('.sortable-list').forEach(list => {
+            const containerId = list.getAttribute('data-container');
+            list.querySelectorAll('.part-card').forEach(item => {
+                const part = meetingParts.find(p => p.id === item.id);
+                if(part) newOrder.push({ ...part, container: containerId });
+            });
+        });
+        meetingParts = newOrder;
+        localStorage.setItem('jw_parts_v15', JSON.stringify(meetingParts));
+    }
+
+    function openModal(title, body, confirmFn) {
+        document.getElementById('modalTitle').innerText = title;
+        document.getElementById('modalBody').innerHTML = body;
+        document.getElementById('modalConfirmBtn').onclick = () => { confirmFn(); closeModal(); };
+        document.getElementById('customModal').style.display = 'flex';
+    }
+    function closeModal() { document.getElementById('customModal').style.display = 'none'; }
+
+    function openAddModal(containerId, colorClass) {
+        const body = `<input type="text" id="mNome" placeholder="Nome da Parte"><input type="number" id="mMeta" placeholder="Minutos">`;
+        openModal("Adicionar Parte", body, () => {
+            const nome = document.getElementById('mNome').value;
+            const meta = document.getElementById('mMeta').value;
+            if(nome && meta) {
+                const id = "p" + Date.now();
+                meetingParts.push({ id, nome, meta: parseInt(meta), container: containerId, cor: colorClass });
+                saveAll();
+            }
+        });
+    }
+
+    function openEditModal(id) {
+        const p = meetingParts.find(x => x.id === id);
+        const body = `<input type="text" id="mNome" value="${p.nome}"><input type="number" id="mMeta" value="${p.meta}">`;
+        openModal("Editar Parte", body, () => {
+            p.nome = document.getElementById('mNome').value;
+            p.meta = parseInt(document.getElementById('mMeta').value);
+            saveAll();
+        });
+    }
+
+    function confirmDelete(id) { openModal("Remover?", "Excluir esta parte?", () => { meetingParts = meetingParts.filter(p => p.id !== id); saveAll(); }); }
+    function confirmReset(id) { openModal("Zerar?", "Reiniciar cronômetro?", () => { timers[id].sec = 0; timers[id].running = false; render(); }); }
+    function openAdjustModal(id) {
+        const body = `<input type="number" id="mAdj" placeholder="Minutos passados">`;
+        openModal("Ajuste Manual", body, () => { timers[id].sec = parseInt(document.getElementById('mAdj').value) * 60; updateDisplay(id); });
+    }
+
+    function openHistory() {
+        let body = history.length ? "" : "<p style='text-align:center'>Nenhum registro.</p>";
+        history.slice().reverse().forEach(h => { body += `<div class="history-item"><strong>${h.data}</strong><br>${h.resumo}</div>`; });
+        body += `<button onclick="clearHistory()" class="modal-btn" style="width:100%; margin-top:10px; background:#333; color:white">Limpar Tudo</button>`;
+        openModal("Histórico Recente", `<div style="max-height:300px; overflow-y:auto">${body}</div>`, () => {});
+    }
+    function clearHistory() { history = []; localStorage.setItem('jw_history_v15', JSON.stringify(history)); closeModal(); }
+
+    function saveAll() { localStorage.setItem('jw_parts_v15', JSON.stringify(meetingParts)); render(); }
+    function toggleTimer(id) { timers[id].running = !timers[id].running; render(); }
+    
+    function toggleConfigMode() { 
+        const isConfig = document.getElementById('body').classList.toggle('config-mode');
+        document.getElementById('config-icon').style.color = isConfig ? 'var(--success-color)' : 'inherit';
+        document.getElementById('config-text').innerText = isConfig ? 'Pronto' : 'Configurar';
+        initDragAndDrop();
+    }
+
+    function toggleAccordion(id, headerElement) { 
+        const content = document.getElementById(id);
+        const icon = headerElement.querySelector('.acc-icon');
+        content.classList.toggle('open');
+        icon.innerText = content.classList.contains('open') ? 'expand_less' : 'expand_more';
+    }
+
+    function switchTab(t) {
+        document.querySelectorAll('.content, .tab').forEach(e => e.classList.remove('active'));
+        document.getElementById(t).classList.add('active');
+        event.currentTarget.classList.add('active');
+    }
+
+    setInterval(() => {
+        Object.keys(timers).forEach(id => { if(timers[id].running) { timers[id].sec++; updateDisplay(id); }});
+        localStorage.setItem('jw_timers_v15', JSON.stringify(timers));
+    }, 1000);
+
+    function sendWhatsApp() {
+        const abaAtiva = document.querySelector('.content.active').id;
+        let txt = "*⏱️ TEMPO DAS PARTES*\n\n";
+        let resumoHistorico = "";
+
+        if (abaAtiva === 'meio') {
+            const secoes = [
+                { id: "acc-tesouros", titulo: "TESOUROS DA PALAVRA" },
+                { id: "acc-ministerio", titulo: "FAÇA SEU MELHOR" },
+                { id: "acc-vida", titulo: "NOSSA VIDA CRISTÃ" }
+            ];
+
+            secoes.forEach(sec => {
+                const partesSecao = meetingParts.filter(p => p.container === sec.id);
+                if (partesSecao.length > 0) {
+                    txt += `• *${sec.titulo}*\n`;
+                    partesSecao.forEach(p => {
+                        const time = document.getElementById(`disp-${p.id}`).innerText;
+                        txt += `${p.nome}: ${time}\n`;
+                        resumoHistorico += `${p.nome}: ${time} | `;
+                    });
+                    txt += "\n";
+                }
+            });
+        } else {
+            meetingParts.filter(p => p.container === 'list-fim').forEach(p => {
+                const time = document.getElementById(`disp-${p.id}`).innerText;
+                txt += `*${p.nome}:* ${time}\n`;
+                resumoHistorico += `${p.nome}: ${time} | `;
+            });
+        }
+
+        const agora = new Date();
+        history.push({ data: agora.toLocaleDateString() + " " + agora.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}), resumo: resumoHistorico });
+        localStorage.setItem('jw_history_v15', JSON.stringify(history));
+        window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(txt.trim()), '_blank');
+    }
+
+    initTheme();
+    render();
+</script>
+</body>
+</html>
