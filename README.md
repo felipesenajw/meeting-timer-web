@@ -2,6 +2,8 @@
 
 Um cronômetro progressivo e intuitivo desenvolvido para gestão de tempo em reuniões, com foco em usabilidade mobile e feedback visual em tempo real.
 
+[ ![Acesse o App](https://img.shields.io/badge/Acesse%20o%20App-Clique%20Aqui-5a3d8d?style=for-the-badge) ](https://felipesenajw.github.io/meeting-timer-web/)
+
 ## 🚀 Funcionalidades
 - **Feedback Visual:** Cards mudam de cor (amarelo/vermelho) conforme o tempo se aproxima da meta ou a ultrapassa.
 - **Organização Flexível:** Arraste e solte (Drag & Drop) para reordenar partes dentro das seções.
