@@ -44,7 +44,7 @@
 
         * { font-family: 'Ubuntu', sans-serif; -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
 
-        body { background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 10px; padding-bottom: 140px; transition: 0.3s; overflow-x: hidden; }
+        body { background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 10px; padding-bottom: 160px; transition: 0.3s; overflow-x: hidden; }
         .container { max-width: 500px; margin: auto; background: var(--card-bg); padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         
         .header-box { text-align: center; margin-bottom: 15px; }
@@ -72,7 +72,6 @@
         .color-vida-crista { border-left-color: var(--vida-crista); }
         .color-fim { border-left-color: var(--primary-color); }
 
-        /* Estados de Alerta Visual */
         .alert-warning { background-color: rgba(255, 193, 7, 0.15) !important; border-color: var(--warning-color) !important; }
         .alert-danger { background-color: rgba(220, 53, 69, 0.15) !important; border-color: var(--danger-color) !important; }
 
@@ -94,6 +93,13 @@
         .btn-pause { background: var(--danger-color); }
         .btn-reset { background: #6c757d; }
         
+        .total-box { margin-top: 20px; padding: 15px; background: rgba(90, 61, 141, 0.1); border-radius: 8px; border: 1px dashed var(--primary-color); text-align: center; }
+        .total-label { font-size: 0.8rem; font-weight: 700; color: var(--primary-color); text-transform: uppercase; margin-bottom: 5px; display: block; }
+        .total-value { font-size: 1.8rem; font-weight: 700; color: var(--text-color); }
+
+        .btn-reset-all { width: 100%; padding: 8px; margin-top: 10px; background: transparent; border: 1px solid var(--danger-color); color: var(--danger-color); border-radius: 8px; font-weight: 700; font-size: 0.75rem; cursor: pointer; text-transform: uppercase; transition: 0.3s; }
+        .btn-reset-all:active { background: var(--danger-color); color: white; }
+
         .btn-config-action { width: 28px; height: 28px; position: absolute; display: none; z-index: 10; border-radius: 50%; border: none; color: white; cursor: pointer; align-items: center; justify-content: center; }
         .btn-delete { background: #333; top: -10px; right: -10px; }
         .btn-edit { background: var(--primary-color); top: -10px; right: 25px; }
@@ -111,7 +117,7 @@
         .nav-item { background: none; border: none; color: var(--text-color); cursor: pointer; display: flex; flex-direction: column; align-items: center; font-size: 0.75rem; font-weight: 500; }
         .nav-item .material-icons { font-size: 24px; margin-bottom: 2px; }
 
-        .btn-whatsapp { position: fixed; bottom: 85px; right: 20px; background: var(--whatsapp-color); color: white; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); border: none; z-index: 99; }
+        .btn-whatsapp { position: fixed; bottom: 100px; right: 20px; background: var(--whatsapp-color); color: white; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); border: none; z-index: 99; }
 
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; justify-content: center; align-items: center; }
         .modal { background: var(--card-bg); color: var(--text-color); padding: 20px; border-radius: 15px; width: 85%; max-width: 350px; }
@@ -160,11 +166,21 @@
             <div id="acc-vida" class="accordion-content sortable-list" data-container="acc-vida"></div>
             <button class="btn-add" onclick="openAddModal('acc-vida', 'color-vida-crista')">+ Adicionar Parte</button>
         </div>
+        <div class="total-box">
+            <span class="total-label">Tempo Total da Reunião</span>
+            <div class="total-value" id="total-meio">00:00</div>
+            <button class="btn-reset-all" onclick="confirmResetAll('meio')">Zerar Todos desta Aba</button>
+        </div>
     </div>
 
     <div id="fim" class="content">
         <div id="list-fim" class="sortable-list" data-container="list-fim"></div>
         <button class="btn-add" onclick="openAddModal('list-fim', 'color-fim')">+ Adicionar Parte</button>
+        <div class="total-box">
+            <span class="total-label">Tempo Total da Reunião</span>
+            <div class="total-value" id="total-fim">00:00</div>
+            <button class="btn-reset-all" onclick="confirmResetAll('fim')">Zerar Todos desta Aba</button>
+        </div>
     </div>
 </div>
 
@@ -208,9 +224,9 @@
         { id: "p8", nome: "Estudo de A Sentinela", meta: 60, container: "list-fim", cor: "color-fim" }
     ];
 
-    let meetingParts = JSON.parse(localStorage.getItem('jw_parts_v15')) || defaultParts;
-    let timers = JSON.parse(localStorage.getItem('jw_timers_v15')) || {};
-    let history = JSON.parse(localStorage.getItem('jw_history_v15')) || [];
+    let meetingParts = JSON.parse(localStorage.getItem('jw_parts_v16')) || defaultParts;
+    let timers = JSON.parse(localStorage.getItem('jw_timers_v16')) || {};
+    let history = JSON.parse(localStorage.getItem('jw_history_v16')) || [];
     let currentTheme = localStorage.getItem('jw_theme') || 'light';
     let sortables = [];
 
@@ -256,7 +272,18 @@
             `;
             updateDisplay(p.id);
         });
+        updateTotal();
         initDragAndDrop();
+    }
+
+    function formatSeconds(totalSeconds) {
+        const h = Math.floor(totalSeconds / 3600);
+        const m = Math.floor((totalSeconds % 3600) / 60);
+        const s = totalSeconds % 60;
+        if (h > 0) {
+            return `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+        }
+        return `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
     }
 
     function updateDisplay(id) {
@@ -266,18 +293,34 @@
         const p = meetingParts.find(x => x.id === id);
         const sec = timers[id].sec;
         const metaSec = p.meta * 60;
-        const m = Math.floor(sec / 60).toString().padStart(2,'0');
-        const s = (sec % 60).toString().padStart(2,'0');
-        el.innerText = `${m}:${s}`;
-
+        
+        el.innerText = formatSeconds(sec);
+        
         card.classList.remove('alert-warning', 'alert-danger');
         el.classList.remove('text-warning', 'text-danger');
-
+        
         if (sec > metaSec) {
             card.classList.add('alert-danger'); el.classList.add('text-danger');
         } else if (sec >= (metaSec - 60) && sec > 0) {
             card.classList.add('alert-warning'); el.classList.add('text-warning');
         }
+    }
+
+    function updateTotal() {
+        let somaMeio = 0;
+        let somaFim = 0;
+
+        meetingParts.forEach(p => {
+            const sec = timers[p.id]?.sec || 0;
+            if (p.container === 'list-fim') {
+                somaFim += sec;
+            } else {
+                somaMeio += sec;
+            }
+        });
+
+        document.getElementById('total-meio').innerText = formatSeconds(somaMeio);
+        document.getElementById('total-fim').innerText = formatSeconds(somaFim);
     }
 
     function initDragAndDrop() {
@@ -299,7 +342,7 @@
             });
         });
         meetingParts = newOrder;
-        localStorage.setItem('jw_parts_v15', JSON.stringify(meetingParts));
+        localStorage.setItem('jw_parts_v16', JSON.stringify(meetingParts));
     }
 
     function openModal(title, body, confirmFn) {
@@ -335,9 +378,23 @@
 
     function confirmDelete(id) { openModal("Remover?", "Excluir esta parte?", () => { meetingParts = meetingParts.filter(p => p.id !== id); saveAll(); }); }
     function confirmReset(id) { openModal("Zerar?", "Reiniciar cronômetro?", () => { timers[id].sec = 0; timers[id].running = false; render(); }); }
+    
+    function confirmResetAll(aba) {
+        openModal("Zerar Tudo?", `Isso vai limpar todos os cronômetros da aba "${aba === 'meio' ? 'Meio de Semana' : 'Fim de Semana'}". Tem certeza?`, () => {
+            meetingParts.forEach(p => {
+                const pAba = p.container === 'list-fim' ? 'fim' : 'meio';
+                if(pAba === aba) {
+                    timers[p.id].sec = 0;
+                    timers[p.id].running = false;
+                }
+            });
+            render();
+        });
+    }
+
     function openAdjustModal(id) {
         const body = `<input type="number" id="mAdj" placeholder="Minutos passados">`;
-        openModal("Ajuste Manual", body, () => { timers[id].sec = parseInt(document.getElementById('mAdj').value) * 60; updateDisplay(id); });
+        openModal("Ajuste Manual", body, () => { timers[id].sec = parseInt(document.getElementById('mAdj').value) * 60; render(); });
     }
 
     function openHistory() {
@@ -346,10 +403,23 @@
         body += `<button onclick="clearHistory()" class="modal-btn" style="width:100%; margin-top:10px; background:#333; color:white">Limpar Tudo</button>`;
         openModal("Histórico Recente", `<div style="max-height:300px; overflow-y:auto">${body}</div>`, () => {});
     }
-    function clearHistory() { history = []; localStorage.setItem('jw_history_v15', JSON.stringify(history)); closeModal(); }
+    function clearHistory() { history = []; localStorage.setItem('jw_history_v16', JSON.stringify(history)); closeModal(); }
 
-    function saveAll() { localStorage.setItem('jw_parts_v15', JSON.stringify(meetingParts)); render(); }
-    function toggleTimer(id) { timers[id].running = !timers[id].running; render(); }
+    function saveAll() { localStorage.setItem('jw_parts_v16', JSON.stringify(meetingParts)); render(); }
+    
+    function toggleTimer(id) { 
+        const vaiRodar = !timers[id].running;
+        
+        // Para todos primeiro para garantir a segurança de um por vez
+        Object.keys(timers).forEach(timerId => {
+            timers[timerId].running = false;
+        });
+
+        // Só ativa o selecionado se o objetivo era dar Play
+        timers[id].running = vaiRodar; 
+        
+        render(); 
+    }
     
     function toggleConfigMode() { 
         const isConfig = document.getElementById('body').classList.toggle('config-mode');
@@ -372,8 +442,18 @@
     }
 
     setInterval(() => {
-        Object.keys(timers).forEach(id => { if(timers[id].running) { timers[id].sec++; updateDisplay(id); }});
-        localStorage.setItem('jw_timers_v15', JSON.stringify(timers));
+        let changed = false;
+        Object.keys(timers).forEach(id => { 
+            if(timers[id].running) { 
+                timers[id].sec++; 
+                updateDisplay(id); 
+                changed = true;
+            }
+        });
+        if(changed) {
+            updateTotal();
+            localStorage.setItem('jw_timers_v16', JSON.stringify(timers));
+        }
     }, 1000);
 
     function sendWhatsApp() {
@@ -400,17 +480,19 @@
                     txt += "\n";
                 }
             });
+            txt += `*TEMPO TOTAL DA REUNIÃO: ${document.getElementById('total-meio').innerText}*`;
         } else {
             meetingParts.filter(p => p.container === 'list-fim').forEach(p => {
                 const time = document.getElementById(`disp-${p.id}`).innerText;
                 txt += `*${p.nome}:* ${time}\n`;
                 resumoHistorico += `${p.nome}: ${time} | `;
             });
+            txt += `\n*TEMPO TOTAL DA REUNIÃO: ${document.getElementById('total-fim').innerText}*`;
         }
 
         const agora = new Date();
         history.push({ data: agora.toLocaleDateString() + " " + agora.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}), resumo: resumoHistorico });
-        localStorage.setItem('jw_history_v15', JSON.stringify(history));
+        localStorage.setItem('jw_history_v16', JSON.stringify(history));
         window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(txt.trim()), '_blank');
     }
 
