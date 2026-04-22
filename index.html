@@ -58,29 +58,40 @@
         .accordion-content { display: none; padding: 10px; background: var(--card-bg); min-height: 20px; }
         .accordion-content.open { display: block; }
 
-        /* Card e Handle */
         .part-card { background: var(--card-bg); border: 1px solid var(--border-color); padding: 12px; border-radius: 8px; margin-bottom: 15px; border-left: 5px solid #ccc; position: relative; }
         
         .drag-handle { display: none; align-items: center; gap: 5px; margin-bottom: 5px; color: var(--text-color); opacity: 0.7; }
         .config-mode .drag-handle { display: flex; cursor: grab; }
-        .config-mode .part-card { cursor: grab; }
 
         .color-tesouros { border-left-color: var(--tesouros); }
         .color-ministerio { border-left-color: var(--ministerio); }
         .color-vida-crista { border-left-color: var(--vida-crista); }
         .color-fim { border-left-color: var(--primary-color); }
 
-        .participant-input { width: 100%; border: none; border-bottom: 1px dashed #ccc; background: transparent; color: var(--text-color); font-size: 0.85rem; margin-top: 5px; outline: none; }
+        /* Estilo do Input para facilitar o toque */
+        .participant-input { 
+            width: 100%; 
+            border: none; 
+            border-bottom: 1px dashed #ccc; 
+            background: transparent; 
+            color: var(--text-color); 
+            font-size: 0.9rem; 
+            margin-top: 8px; 
+            padding: 5px 0;
+            outline: none; 
+            position: relative;
+            z-index: 50; /* Garante que fique acima de camadas de arraste */
+        }
 
         .timer-row { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
         .timer-display { font-size: 1.8rem; font-weight: 700; cursor: pointer; }
         .controls { display: flex; gap: 8px; }
-        .icon-btn { border: none; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; color: white; position: relative; z-index: 10; }
+        .icon-btn { border: none; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; color: white; z-index: 10; }
         .btn-play { background: var(--success-color); }
         .btn-pause { background: var(--danger-color); }
         .btn-reset { background: #6c757d; }
 
-        .btn-config-action { width: 36px; height: 36px; position: absolute; display: none; border-radius: 50%; border: none; color: white; cursor: pointer; align-items: center; justify-content: center; z-index: 20; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+        .btn-config-action { width: 36px; height: 36px; position: absolute; display: none; border-radius: 50%; border: none; color: white; cursor: pointer; align-items: center; justify-content: center; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
         .btn-delete { background: #333; top: -12px; right: -12px; }
         .btn-edit { background: var(--primary-color); top: -12px; right: 30px; }
         
@@ -89,12 +100,15 @@
 
         .total-box { margin-top: 20px; padding: 15px; background: rgba(90, 61, 141, 0.05); border-radius: 8px; border: 1px dashed var(--primary-color); text-align: center; }
         .total-value { font-size: 1.6rem; font-weight: 700; margin-bottom: 8px; display: block; }
+        
+        .action-group { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
         .btn-reset-all { width: 100%; padding: 12px; background: transparent; border: 1px solid var(--danger-color); color: var(--danger-color); border-radius: 8px; font-weight: 700; font-size: 0.75rem; cursor: pointer; text-transform: uppercase; }
+        .btn-clear-names { width: 100%; padding: 12px; background: transparent; border: 1px solid #6c757d; color: #6c757d; border-radius: 8px; font-weight: 700; font-size: 0.75rem; cursor: pointer; text-transform: uppercase; }
 
-        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--nav-bg); border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; padding: 10px 0; z-index: 100; }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--nav-bg); border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; padding: 10px 0; z-index: 200; }
         .nav-item { background: none; border: none; color: var(--text-color); cursor: pointer; display: flex; flex-direction: column; align-items: center; font-size: 0.75rem; }
         
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; justify-content: center; align-items: center; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 3000; justify-content: center; align-items: center; }
         .modal { background: var(--card-bg); color: var(--text-color); padding: 20px; border-radius: 15px; width: 85%; max-width: 350px; }
         .modal input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-color); color: var(--text-color); }
         .modal-footer { display: flex; gap: 10px; margin-top: 15px; }
@@ -131,7 +145,10 @@
         <div class="total-box">
             <span style="font-size: 0.7rem; font-weight:700; color:var(--primary-color)">TOTAL DA REUNIÃO</span>
             <span class="total-value" id="total-meio">00:00</span>
-            <button class="btn-reset-all" onclick="confirmResetAll('meio')">Zerar Todos da Aba</button>
+            <button class="btn-reset-all" onclick="confirmResetAll('meio')">Zerar Cronômetros da Aba</button>
+        </div>
+        <div class="action-group">
+            <button class="btn-clear-names" onclick="confirmClearNames('meio')">Limpar Todos os Nomes</button>
         </div>
     </div>
 
@@ -140,7 +157,10 @@
         <div class="total-box">
             <span style="font-size: 0.7rem; font-weight:700; color:var(--primary-color)">TOTAL DA REUNIÃO</span>
             <span class="total-value" id="total-fim">00:00</span>
-            <button class="btn-reset-all" onclick="confirmResetAll('fim')">Zerar Todos da Aba</button>
+            <button class="btn-reset-all" onclick="confirmResetAll('fim')">Zerar Cronômetros da Aba</button>
+        </div>
+        <div class="action-group">
+            <button class="btn-clear-names" onclick="confirmClearNames('fim')">Limpar Todos os Nomes</button>
         </div>
     </div>
 </div>
@@ -180,10 +200,10 @@
         { id: "p10", nome: "Estudo de A Sentinela", meta: 60, container: "list-fim", cor: "color-fim", label: "📢 FIM DE SEMANA" }
     ];
 
-    let meetingParts = JSON.parse(localStorage.getItem('jw_parts_v29')) || defaultParts;
-    let timers = JSON.parse(localStorage.getItem('jw_timers_v29')) || {};
-    let participants = JSON.parse(localStorage.getItem('jw_names_v29')) || {};
-    let history = JSON.parse(localStorage.getItem('jw_history_v29')) || [];
+    let meetingParts = JSON.parse(localStorage.getItem('jw_parts_v31')) || defaultParts;
+    let timers = JSON.parse(localStorage.getItem('jw_timers_v31')) || {};
+    let participants = JSON.parse(localStorage.getItem('jw_names_v31')) || {};
+    let history = JSON.parse(localStorage.getItem('jw_history_v31')) || [];
     let currentTab = 'meio';
 
     function render() {
@@ -193,7 +213,8 @@
                 animation: 150,
                 ghostClass: 'sortable-ghost',
                 disabled: !document.getElementById('body').classList.contains('config-mode'),
-                filter: 'input, button', // Impede arraste ao clicar em inputs ou botões
+                filter: '.participant-input, button', // Ignora inputs e botões para o arraste
+                preventOnFilter: false, // Permite o evento nativo (como focar no input)
                 onEnd: function() {
                     const newOrder = [];
                     document.querySelectorAll('.part-card').forEach(card => {
@@ -251,8 +272,8 @@
         save(); render();
     }
 
-    function saveName(id, val) { participants[id] = val; localStorage.setItem('jw_names_v29', JSON.stringify(participants)); }
-    function save() { localStorage.setItem('jw_timers_v29', JSON.stringify(timers)); localStorage.setItem('jw_parts_v29', JSON.stringify(meetingParts)); }
+    function saveName(id, val) { participants[id] = val; localStorage.setItem('jw_names_v31', JSON.stringify(participants)); }
+    function save() { localStorage.setItem('jw_timers_v31', JSON.stringify(timers)); localStorage.setItem('jw_parts_v31', JSON.stringify(meetingParts)); }
 
     function updateDisplay(id) {
         const p = meetingParts.find(x => x.id === id);
@@ -300,7 +321,7 @@
         const isConfig = body.classList.contains('config-mode');
         document.getElementById('config-icon').innerText = isConfig ? 'check_circle' : 'settings';
         document.getElementById('config-label').innerText = isConfig ? 'Pronto' : 'Configurar';
-        render(); // Re-render para ativar/desativar o Sortable
+        render();
     }
 
     function confirmDelete(id) { openModal("Remover?", "Excluir esta parte?", () => { meetingParts = meetingParts.filter(p => p.id !== id); save(); render(); }); }
@@ -314,7 +335,30 @@
     }
 
     function confirmResetPart(id) { openModal("Zerar?", "Reiniciar cronômetro?", () => { timers[id].sec = 0; timers[id].running = false; save(); render(); }); }
-    function confirmResetAll(aba) { openModal("Zerar Aba?", "Zerar todos os tempos desta aba?", () => { meetingParts.forEach(p => { if((aba==='fim' && p.container==='list-fim') || (aba==='meio' && p.container!=='list-fim')) { timers[p.id].sec=0; timers[p.id].running=false; } }); save(); render(); }); }
+    
+    function confirmResetAll(aba) { 
+        openModal("Zerar Aba?", "Zerar todos os tempos desta aba?", () => { 
+            meetingParts.forEach(p => { 
+                if((aba==='fim' && p.container==='list-fim') || (aba==='meio' && p.container!=='list-fim')) { 
+                    timers[p.id].sec=0; timers[p.id].running=false; 
+                } 
+            }); 
+            save(); render(); 
+        }); 
+    }
+
+    function confirmClearNames(aba) {
+        openModal("Limpar Nomes?", "Isso apagará todos os nomes desta aba. Confirmar?", () => {
+            meetingParts.forEach(p => {
+                if((aba==='fim' && p.container==='list-fim') || (aba==='meio' && p.container!=='list-fim')) {
+                    participants[p.id] = "";
+                }
+            });
+            localStorage.setItem('jw_names_v31', JSON.stringify(participants));
+            render();
+        });
+    }
+
     function openAdjustModal(id) { openModal("Ajustar", `Minutos: <input type="number" id="adjM">`, () => { timers[id].sec = (parseInt(document.getElementById('adjM').value) || 0) * 60; save(); render(); }); }
 
     function openModal(title, body, confirmFn, showCancel = true) {
@@ -370,7 +414,7 @@
         if(!hasData) { openModal("Aviso", "Não há tempos registrados.", () => {}, false); return; }
         const agora = new Date();
         history.push({ data: agora.toLocaleDateString() + " " + agora.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}), resumo: resumoHist });
-        localStorage.setItem('jw_history_v29', JSON.stringify(history));
+        localStorage.setItem('jw_history_v31', JSON.stringify(history));
         window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(txt));
     }
 
