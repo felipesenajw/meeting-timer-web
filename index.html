@@ -9,12 +9,10 @@
     <link rel="apple-touch-icon" href="https://cdn.jsdelivr.net/gh/felipesenajw/meeting-timer-web@main/icon.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Timer Reunião">
     <meta name="theme-color" content="#5a3d8d">
 
     <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
 
     <style>
         :root {
@@ -29,7 +27,6 @@
             --card-bg: #ffffff;
             --text-color: #333333;
             --border-color: #dddddd;
-            --whatsapp-color: #25D366;
             --nav-bg: #ffffff;
         }
 
@@ -43,12 +40,10 @@
         }
 
         * { font-family: 'Ubuntu', sans-serif; -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
-
-        body { background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 10px; padding-bottom: 160px; transition: 0.3s; overflow-x: hidden; }
+        body { background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 10px; padding-bottom: 140px; transition: 0.3s; }
         .container { max-width: 500px; margin: auto; background: var(--card-bg); padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         
-        .header-box { text-align: center; margin-bottom: 15px; }
-        h2 { color: var(--primary-color); margin: 0; font-size: 1.5rem; font-weight: 700; }
+        h2 { color: var(--primary-color); text-align: center; font-size: 1.5rem; margin-bottom: 15px; font-weight: 700; }
 
         .tabs { display: flex; border-radius: 8px; overflow: hidden; margin-bottom: 15px; border: 1px solid var(--primary-color); }
         .tab { flex: 1; padding: 12px; text-align: center; cursor: pointer; background: transparent; font-weight: 500; font-size: 0.9rem; border: none; color: var(--text-color); }
@@ -58,155 +53,112 @@
         .content.active { display: block; }
 
         .accordion { margin-bottom: 10px; border-radius: 8px; overflow: hidden; border: 1px solid var(--border-color); }
-        .accordion-header { padding: 12px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; color: white; font-weight: 500; font-size: 0.85rem; letter-spacing: 0.5px; }
-        .accordion-content { display: none; padding: 10px; background: var(--card-bg); min-height: 20px; }
+        .accordion-header { padding: 12px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; color: white; font-weight: 500; font-size: 0.85rem; }
+        .accordion-content { display: none; padding: 10px; background: var(--card-bg); }
         .accordion-content.open { display: block; }
 
-        .bg-tesouros { background-color: var(--tesouros); }
-        .bg-ministerio { background-color: var(--ministerio); }
-        .bg-vida-crista { background-color: var(--vida-crista); }
-
-        .part-card { background: var(--card-bg); border: 1px solid var(--border-color); padding: 12px; border-radius: 8px; margin-bottom: 8px; border-left: 5px solid #ccc; position: relative; transition: background-color 0.4s, border-color 0.4s; }
+        .part-card { background: var(--card-bg); border: 1px solid var(--border-color); padding: 12px; border-radius: 8px; margin-bottom: 8px; border-left: 5px solid #ccc; position: relative; }
         .color-tesouros { border-left-color: var(--tesouros); }
         .color-ministerio { border-left-color: var(--ministerio); }
         .color-vida-crista { border-left-color: var(--vida-crista); }
         .color-fim { border-left-color: var(--primary-color); }
 
-        .alert-warning { background-color: rgba(255, 193, 7, 0.15) !important; border-color: var(--warning-color) !important; }
-        .alert-danger { background-color: rgba(220, 53, 69, 0.15) !important; border-color: var(--danger-color) !important; }
+        .participant-input { width: 100%; border: none; border-bottom: 1px dashed #ccc; background: transparent; color: var(--text-color); font-size: 0.85rem; margin-top: 5px; outline: none; }
 
-        .part-info { display: flex; justify-content: space-between; align-items: center; pointer-events: none; }
-        .part-name { font-weight: 500; font-size: 1rem; }
-        .meta-text { font-size: 0.75rem; color: #888; font-weight: 700; }
-        
-        .timer-row { display: flex; justify-content: space-between; align-items: center; margin-top: 5px; }
-        .timer-display { font-size: 2rem; font-weight: 700; cursor: pointer; }
-        .text-danger { color: var(--danger-color); animation: blink 1s infinite; }
-        .text-warning { color: #d39e00; }
-        [data-theme="dark"] .text-warning { color: var(--warning-color); }
-
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
-
+        .timer-row { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+        .timer-display { font-size: 1.8rem; font-weight: 700; cursor: pointer; }
         .controls { display: flex; gap: 8px; }
-        .icon-btn { border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; color: white; }
+        .icon-btn { border: none; width: 38px; height: 38px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; color: white; }
         .btn-play { background: var(--success-color); }
         .btn-pause { background: var(--danger-color); }
         .btn-reset { background: #6c757d; }
-        
-        .total-box { margin-top: 20px; padding: 15px; background: rgba(90, 61, 141, 0.1); border-radius: 8px; border: 1px dashed var(--primary-color); text-align: center; }
-        .total-label { font-size: 0.8rem; font-weight: 700; color: var(--primary-color); text-transform: uppercase; margin-bottom: 5px; display: block; }
-        .total-value { font-size: 1.8rem; font-weight: 700; color: var(--text-color); }
 
-        .btn-reset-all { width: 100%; padding: 8px; margin-top: 10px; background: transparent; border: 1px solid var(--danger-color); color: var(--danger-color); border-radius: 8px; font-weight: 700; font-size: 0.75rem; cursor: pointer; text-transform: uppercase; transition: 0.3s; }
-        .btn-reset-all:active { background: var(--danger-color); color: white; }
+        .total-box { margin-top: 15px; padding: 15px; background: rgba(90, 61, 141, 0.05); border-radius: 8px; border: 1px dashed var(--primary-color); text-align: center; }
+        .total-value { font-size: 1.6rem; font-weight: 700; margin-bottom: 8px; }
+        .btn-reset-all { width: 100%; padding: 10px; background: transparent; border: 1px solid var(--danger-color); color: var(--danger-color); border-radius: 8px; font-weight: 700; font-size: 0.75rem; cursor: pointer; text-transform: uppercase; }
 
-        .btn-config-action { width: 28px; height: 28px; position: absolute; display: none; z-index: 10; border-radius: 50%; border: none; color: white; cursor: pointer; align-items: center; justify-content: center; }
+        .btn-config-action { width: 28px; height: 28px; position: absolute; display: none; border-radius: 50%; border: none; color: white; cursor: pointer; align-items: center; justify-content: center; z-index: 10; }
         .btn-delete { background: #333; top: -10px; right: -10px; }
         .btn-edit { background: var(--primary-color); top: -10px; right: 25px; }
-
-        .drag-handle { display: none; margin-right: 10px; color: #888; }
-        .config-mode .drag-handle { display: block; }
-        .config-mode .part-card { cursor: move; touch-action: none; }
         .config-mode .btn-config-action { display: flex; }
-        .config-mode .timer-row { opacity: 0.3; pointer-events: none; }
+        .config-mode .timer-row { opacity: 0.2; pointer-events: none; }
 
-        .btn-add { width: 100%; padding: 10px; margin-top: 5px; border: 2px dashed #666; border-radius: 8px; background: transparent; display: none; font-weight: 500; color: var(--text-color); cursor: pointer; }
-        .config-mode .btn-add { display: block; }
+        .status-bar { position: fixed; bottom: 75px; left: 0; width: 100%; text-align: center; font-size: 10px; color: #888; font-weight: 700; }
+        .status-item { opacity: 0.2; display: inline-flex; align-items: center; gap: 4px; }
+        .status-item.active { opacity: 1; color: var(--success-color); }
 
-        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--nav-bg); border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; align-items: center; padding: 10px 0; z-index: 100; padding-bottom: env(safe-area-inset-bottom); }
-        .nav-item { background: none; border: none; color: var(--text-color); cursor: pointer; display: flex; flex-direction: column; align-items: center; font-size: 0.75rem; font-weight: 500; }
-        .nav-item .material-icons { font-size: 24px; margin-bottom: 2px; }
-
-        .btn-whatsapp { position: fixed; bottom: 100px; right: 20px; background: var(--whatsapp-color); color: white; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); border: none; z-index: 99; }
-
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--nav-bg); border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; padding: 10px 0; z-index: 100; }
+        .nav-item { background: none; border: none; color: var(--text-color); cursor: pointer; display: flex; flex-direction: column; align-items: center; font-size: 0.75rem; }
+        
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; justify-content: center; align-items: center; }
         .modal { background: var(--card-bg); color: var(--text-color); padding: 20px; border-radius: 15px; width: 85%; max-width: 350px; }
-        .modal h3 { font-weight: 700; margin-top: 0; text-align: center; }
-        .modal input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; background: var(--bg-color); color: var(--text-color); font-size: 1rem; }
-        .modal-footer { display: flex; justify-content: space-between; margin-top: 20px; gap: 10px; }
+        .modal input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-color); color: var(--text-color); }
+        .modal-footer { display: flex; gap: 10px; margin-top: 15px; }
         .modal-btn { flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; }
-
-        .history-item { border-bottom: 1px solid var(--border-color); padding: 10px 0; text-align: left; font-size: 0.85rem; line-height: 1.4; }
     </style>
 </head>
 <body id="body">
 
 <div class="container">
-    <div class="header-box">
-        <h2>Timer para Reuniões</h2>
-    </div>
+    <h2>Timer para Reuniões</h2>
 
     <div class="tabs">
-        <button class="tab active" onclick="switchTab('meio')">Meio de Semana</button>
-        <button class="tab" onclick="switchTab('fim')">Fim de Semana</button>
+        <button class="tab active" id="tab-btn-meio" onclick="switchTab('meio')">Meio de Semana</button>
+        <button class="tab" id="tab-btn-fim" onclick="switchTab('fim')">Fim de Semana</button>
     </div>
 
     <div id="meio" class="content active">
         <div class="accordion">
-            <div class="accordion-header bg-tesouros" onclick="toggleAccordion('acc-tesouros', this)">
-                <span>TESOUROS DA PALAVRA</span>
-                <span class="material-icons acc-icon">expand_less</span>
-            </div>
-            <div id="acc-tesouros" class="accordion-content open sortable-list" data-container="acc-tesouros"></div>
-            <button class="btn-add" onclick="openAddModal('acc-tesouros', 'color-tesouros')">+ Adicionar Parte</button>
+            <div class="accordion-header" style="background-color:var(--tesouros)" onclick="toggleAcc('acc-tesouros', this)">TESOUROS DA PALAVRA <span class="material-icons">expand_more</span></div>
+            <div id="acc-tesouros" class="accordion-content sortable-list" data-container="acc-tesouros"></div>
         </div>
         <div class="accordion">
-            <div class="accordion-header bg-ministerio" onclick="toggleAccordion('acc-ministerio', this)">
-                <span>FAÇA SEU MELHOR</span>
-                <span class="material-icons acc-icon">expand_more</span>
-            </div>
+            <div class="accordion-header" style="background-color:var(--ministerio)" onclick="toggleAcc('acc-ministerio', this)">FAÇA SEU MELHOR <span class="material-icons">expand_more</span></div>
             <div id="acc-ministerio" class="accordion-content sortable-list" data-container="acc-ministerio"></div>
-            <button class="btn-add" onclick="openAddModal('acc-ministerio', 'color-ministerio')">+ Adicionar Parte</button>
         </div>
         <div class="accordion">
-            <div class="accordion-header bg-vida-crista" onclick="toggleAccordion('acc-vida', this)">
-                <span>NOSSA VIDA CRISTÃ</span>
-                <span class="material-icons acc-icon">expand_more</span>
-            </div>
+            <div class="accordion-header" style="background-color:var(--vida-crista)" onclick="toggleAcc('acc-vida', this)">NOSSA VIDA CRISTÃ <span class="material-icons">expand_more</span></div>
             <div id="acc-vida" class="accordion-content sortable-list" data-container="acc-vida"></div>
-            <button class="btn-add" onclick="openAddModal('acc-vida', 'color-vida-crista')">+ Adicionar Parte</button>
         </div>
         <div class="total-box">
-            <span class="total-label">Tempo Total da Reunião</span>
+            <div style="font-size: 0.7rem; font-weight:700; color:var(--primary-color)">TOTAL DA REUNIÃO</div>
             <div class="total-value" id="total-meio">00:00</div>
-            <button class="btn-reset-all" onclick="confirmResetAll('meio')">Zerar Todos desta Aba</button>
+            <button class="btn-reset-all" onclick="confirmResetAll('meio')">Zerar Todos da Aba</button>
         </div>
     </div>
 
     <div id="fim" class="content">
         <div id="list-fim" class="sortable-list" data-container="list-fim"></div>
-        <button class="btn-add" onclick="openAddModal('list-fim', 'color-fim')">+ Adicionar Parte</button>
         <div class="total-box">
-            <span class="total-label">Tempo Total da Reunião</span>
+            <div style="font-size: 0.7rem; font-weight:700; color:var(--primary-color)">TOTAL DA REUNIÃO</div>
             <div class="total-value" id="total-fim">00:00</div>
-            <button class="btn-reset-all" onclick="confirmResetAll('fim')">Zerar Todos desta Aba</button>
+            <button class="btn-reset-all" onclick="confirmResetAll('fim')">Zerar Todos da Aba</button>
         </div>
     </div>
 </div>
 
-<button class="btn-whatsapp" onclick="sendWhatsApp()"><span class="material-icons" style="font-size:30px">share</span></button>
+<div class="status-bar">
+    <span id="status-wake" class="status-item">
+        <span class="material-icons" style="font-size: 14px">lightbulb</span> TELA SEMPRE ACESA
+    </span>
+</div>
 
 <nav class="bottom-nav">
-    <button class="nav-item" onclick="openHistory()">
-        <span class="material-icons">history</span>
-        <span>Histórico</span>
-    </button>
-    <button class="nav-item" onclick="toggleTheme()">
-        <span class="material-icons" id="theme-icon">dark_mode</span>
-        <span>Tema</span>
-    </button>
-    <button class="nav-item" onclick="toggleConfigMode()">
+    <button class="nav-item" onclick="openHistory()"><span class="material-icons">history</span>Histórico</button>
+    <button class="nav-item" onclick="toggleTheme()"><span class="material-icons">brightness_6</span>Tema</button>
+    <button class="nav-item" onclick="toggleConfig()" id="btn-config-nav">
         <span class="material-icons" id="config-icon">settings</span>
-        <span id="config-text">Configurar</span>
+        <span id="config-label">Configurar</span>
     </button>
+    <button class="nav-item" onclick="sendWhatsApp()" style="color:var(--success-color)"><span class="material-icons">share</span>Compartilhar</button>
 </nav>
 
 <div id="customModal" class="modal-overlay">
     <div class="modal">
-        <h3 id="modalTitle">Título</h3>
+        <h3 id="modalTitle" style="margin-top:0">Aviso</h3>
         <div id="modalBody"></div>
         <div class="modal-footer">
-            <button class="modal-btn" style="background:#666; color:white" onclick="closeModal()">Cancelar</button>
+            <button class="modal-btn" id="modalCancelBtn" style="background:#666; color:white" onclick="closeModal()">Cancelar</button>
             <button class="modal-btn" style="background:var(--primary-color); color:white" id="modalConfirmBtn">Confirmar</button>
         </div>
     </div>
@@ -214,31 +166,32 @@
 
 <script>
     const defaultParts = [
-        { id: "p1", nome: "Tesouros da Palavra", meta: 10, container: "acc-tesouros", cor: "color-tesouros" },
-        { id: "p2", nome: "Joias Espirituais", meta: 10, container: "acc-tesouros", cor: "color-tesouros" },
-        { id: "p3", nome: "Leitura da Bíblia", meta: 4, container: "acc-tesouros", cor: "color-tesouros" },
-        { id: "p4", nome: "Faça seu Melhor", meta: 15, container: "acc-ministerio", cor: "color-ministerio" },
-        { id: "p5", nome: "Nossa Vida Cristã", meta: 15, container: "acc-vida", cor: "color-vida-crista" },
-        { id: "p6", nome: "Estudo Bíblico", meta: 30, container: "acc-vida", cor: "color-vida-crista" },
-        { id: "p7", nome: "Discurso Público", meta: 30, container: "list-fim", cor: "color-fim" },
-        { id: "p8", nome: "Estudo de A Sentinela", meta: 60, container: "list-fim", cor: "color-fim" }
+        { id: "p1", nome: "Tesouros da Palavra", meta: 10, container: "acc-tesouros", cor: "color-tesouros", label: "💎 TESOUROS" },
+        { id: "p2", nome: "Joias Espirituais", meta: 10, container: "acc-tesouros", cor: "color-tesouros", label: "💎 TESOUROS" },
+        { id: "p3", nome: "Leitura da Bíblia", meta: 4, container: "acc-tesouros", cor: "color-tesouros", label: "💎 TESOUROS" },
+        { id: "p4", nome: "Parte 1", meta: 5, container: "acc-ministerio", cor: "color-ministerio", label: "🎤 MINISTÉRIO" },
+        { id: "p5", nome: "Parte 2", meta: 5, container: "acc-ministerio", cor: "color-ministerio", label: "🎤 MINISTÉRIO" },
+        { id: "p6", nome: "Parte 3", meta: 5, container: "acc-ministerio", cor: "color-ministerio", label: "🎤 MINISTÉRIO" },
+        { id: "p7", nome: "Parte 1", meta: 15, container: "acc-vida", cor: "color-vida-crista", label: "🌳 VIDA CRISTÃ" },
+        { id: "p8", nome: "Estudo Bíblico", meta: 30, container: "acc-vida", cor: "color-vida-crista", label: "🌳 VIDA CRISTÃ" },
+        { id: "p9", nome: "Discurso Público", meta: 30, container: "list-fim", cor: "color-fim", label: "📢 FIM DE SEMANA" },
+        { id: "p10", nome: "Estudo de A Sentinela", meta: 60, container: "list-fim", cor: "color-fim", label: "📢 FIM DE SEMANA" }
     ];
 
-    let meetingParts = JSON.parse(localStorage.getItem('jw_parts_v16')) || defaultParts;
-    let timers = JSON.parse(localStorage.getItem('jw_timers_v16')) || {};
-    let history = JSON.parse(localStorage.getItem('jw_history_v16')) || [];
-    let currentTheme = localStorage.getItem('jw_theme') || 'light';
-    let sortables = [];
+    let currentTab = 'meio';
+    let meetingParts = JSON.parse(localStorage.getItem('jw_parts_v24')) || defaultParts;
+    let timers = JSON.parse(localStorage.getItem('jw_timers_v24')) || {};
+    let participants = JSON.parse(localStorage.getItem('jw_names_v24')) || {};
+    let history = JSON.parse(localStorage.getItem('jw_history_v24')) || [];
+    let wakeLock = null;
 
-    function initTheme() {
-        document.documentElement.setAttribute('data-theme', currentTheme);
-        document.getElementById('theme-icon').innerText = currentTheme === 'light' ? 'dark_mode' : 'light_mode';
-    }
-
-    function toggleTheme() {
-        currentTheme = currentTheme === 'light' ? 'dark' : 'light';
-        localStorage.setItem('jw_theme', currentTheme);
-        initTheme();
+    async function requestWakeLock() {
+        if ('wakeLock' in navigator) {
+            try { 
+                wakeLock = await navigator.wakeLock.request('screen');
+                document.getElementById('status-wake').classList.add('active');
+            } catch (err) {}
+        }
     }
 
     function render() {
@@ -247,256 +200,175 @@
             if (!timers[p.id]) timers[p.id] = { sec: 0, running: false };
             const container = document.querySelector(`[data-container="${p.container}"]`);
             if(!container) return;
-
             container.innerHTML += `
-                <div class="part-card ${p.cor}" id="${p.id}" data-id="${p.id}">
+                <div class="part-card ${p.cor}" id="card-${p.id}">
                     <button class="btn-config-action btn-delete" onclick="confirmDelete('${p.id}')"><span class="material-icons" style="font-size:16px">delete</span></button>
                     <button class="btn-config-action btn-edit" onclick="openEditModal('${p.id}')"><span class="material-icons" style="font-size:16px">edit</span></button>
-                    <div class="part-info">
-                        <div style="display:flex; align-items:center;">
-                            <span class="material-icons drag-handle">drag_indicator</span>
-                            <span class="part-name">${p.nome}</span>
-                        </div>
-                        <span class="meta-text">${p.meta} min</span>
-                    </div>
+                    <div style="font-weight:700; font-size: 0.9rem">${p.nome} <span style="font-size:0.7rem; opacity:0.6">(${p.meta} min)</span></div>
+                    <input type="text" class="participant-input" placeholder="Nome do participante..." 
+                        value="${participants[p.id] || ''}" oninput="saveName('${p.id}', this.value)">
                     <div class="timer-row">
-                        <div class="timer-display" id="disp-${p.id}" onclick="openAdjustModal('${p.id}')">00:00</div>
+                        <div class="timer-display" onclick="openAdjustModal('${p.id}')" id="disp-${p.id}">00:00</div>
                         <div class="controls">
-                            <button id="btn-${p.id}" class="icon-btn ${timers[p.id].running ? 'btn-pause' : 'btn-play'}" onclick="toggleTimer('${p.id}')">
+                            <button class="icon-btn ${timers[p.id].running ? 'btn-pause' : 'btn-play'}" onclick="toggleTimer('${p.id}')">
                                 <span class="material-icons">${timers[p.id].running ? 'pause' : 'play_arrow'}</span>
                             </button>
-                            <button class="icon-btn btn-reset" onclick="confirmReset('${p.id}')"><span class="material-icons">replay</span></button>
+                            <button class="icon-btn btn-reset" onclick="confirmResetPart('${p.id}')"><span class="material-icons">replay</span></button>
                         </div>
                     </div>
-                </div>
-            `;
+                </div>`;
             updateDisplay(p.id);
         });
-        updateTotal();
-        initDragAndDrop();
+        updateTotals();
     }
 
-    function formatSeconds(totalSeconds) {
-        const h = Math.floor(totalSeconds / 3600);
-        const m = Math.floor((totalSeconds % 3600) / 60);
-        const s = totalSeconds % 60;
-        if (h > 0) {
-            return `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
-        }
-        return `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
-    }
-
-    function updateDisplay(id) {
-        const el = document.getElementById(`disp-${id}`);
-        const card = document.getElementById(id);
-        if(!el || !card) return;
-        const p = meetingParts.find(x => x.id === id);
-        const sec = timers[id].sec;
-        const metaSec = p.meta * 60;
-        
-        el.innerText = formatSeconds(sec);
-        
-        card.classList.remove('alert-warning', 'alert-danger');
-        el.classList.remove('text-warning', 'text-danger');
-        
-        if (sec > metaSec) {
-            card.classList.add('alert-danger'); el.classList.add('text-danger');
-        } else if (sec >= (metaSec - 60) && sec > 0) {
-            card.classList.add('alert-warning'); el.classList.add('text-warning');
-        }
-    }
-
-    function updateTotal() {
-        let somaMeio = 0;
-        let somaFim = 0;
-
-        meetingParts.forEach(p => {
-            const sec = timers[p.id]?.sec || 0;
-            if (p.container === 'list-fim') {
-                somaFim += sec;
-            } else {
-                somaMeio += sec;
-            }
-        });
-
-        document.getElementById('total-meio').innerText = formatSeconds(somaMeio);
-        document.getElementById('total-fim').innerText = formatSeconds(somaFim);
-    }
-
-    function initDragAndDrop() {
-        sortables.forEach(s => s.destroy()); sortables = [];
-        const isConfig = document.getElementById('body').classList.contains('config-mode');
-        document.querySelectorAll('.sortable-list').forEach(el => {
-            const s = Sortable.create(el, { animation: 150, handle: '.part-card', disabled: !isConfig, onEnd: saveNewOrder });
-            sortables.push(s);
-        });
-    }
-
-    function saveNewOrder() {
-        const newOrder = [];
-        document.querySelectorAll('.sortable-list').forEach(list => {
-            const containerId = list.getAttribute('data-container');
-            list.querySelectorAll('.part-card').forEach(item => {
-                const part = meetingParts.find(p => p.id === item.id);
-                if(part) newOrder.push({ ...part, container: containerId });
-            });
-        });
-        meetingParts = newOrder;
-        localStorage.setItem('jw_parts_v16', JSON.stringify(meetingParts));
-    }
-
-    function openModal(title, body, confirmFn) {
+    function openModal(title, body, confirmFn, showCancel = true) {
         document.getElementById('modalTitle').innerText = title;
         document.getElementById('modalBody').innerHTML = body;
+        document.getElementById('modalCancelBtn').style.display = showCancel ? 'block' : 'none';
         document.getElementById('modalConfirmBtn').onclick = () => { confirmFn(); closeModal(); };
         document.getElementById('customModal').style.display = 'flex';
     }
     function closeModal() { document.getElementById('customModal').style.display = 'none'; }
 
-    function openAddModal(containerId, colorClass) {
-        const body = `<input type="text" id="mNome" placeholder="Nome da Parte"><input type="number" id="mMeta" placeholder="Minutos">`;
-        openModal("Adicionar Parte", body, () => {
-            const nome = document.getElementById('mNome').value;
-            const meta = document.getElementById('mMeta').value;
-            if(nome && meta) {
-                const id = "p" + Date.now();
-                meetingParts.push({ id, nome, meta: parseInt(meta), container: containerId, cor: colorClass });
-                saveAll();
-            }
-        });
+    function toggleTimer(id) {
+        const state = !timers[id].running;
+        Object.keys(timers).forEach(k => timers[k].running = false);
+        timers[id].running = state;
+        if(state) requestWakeLock();
+        save(); render();
     }
 
-    function openEditModal(id) {
+    function saveName(id, val) { participants[id] = val; localStorage.setItem('jw_names_v24', JSON.stringify(participants)); }
+    function save() { localStorage.setItem('jw_timers_v24', JSON.stringify(timers)); localStorage.setItem('jw_parts_v24', JSON.stringify(meetingParts)); }
+
+    function updateDisplay(id) {
         const p = meetingParts.find(x => x.id === id);
-        const body = `<input type="text" id="mNome" value="${p.nome}"><input type="number" id="mMeta" value="${p.meta}">`;
-        openModal("Editar Parte", body, () => {
-            p.nome = document.getElementById('mNome').value;
-            p.meta = parseInt(document.getElementById('mMeta').value);
-            saveAll();
+        if(!p) return;
+        const sec = timers[id].sec;
+        const el = document.getElementById(`disp-${id}`);
+        const card = document.getElementById(`card-${id}`);
+        if(el) el.innerText = formatTime(sec);
+        if(card) {
+            card.classList.remove('alert-warning', 'alert-danger');
+            if(sec >= p.meta * 60) card.classList.add('alert-danger');
+            else if(sec >= (p.meta * 60 - 60) && sec > 0) card.classList.add('alert-warning');
+        }
+    }
+
+    function updateTotals() {
+        let sM = 0, sF = 0;
+        meetingParts.forEach(p => {
+            const s = timers[p.id].sec;
+            if(p.container === 'list-fim') sF += s; else sM += s;
         });
+        document.getElementById('total-meio').innerText = formatTime(sM);
+        document.getElementById('total-fim').innerText = formatTime(sF);
     }
+    function formatTime(s) { return `${Math.floor(s/60).toString().padStart(2,'0')}:${(s%60).toString().padStart(2,'0')}`; }
 
-    function confirmDelete(id) { openModal("Remover?", "Excluir esta parte?", () => { meetingParts = meetingParts.filter(p => p.id !== id); saveAll(); }); }
-    function confirmReset(id) { openModal("Zerar?", "Reiniciar cronômetro?", () => { timers[id].sec = 0; timers[id].running = false; render(); }); }
-    
-    function confirmResetAll(aba) {
-        openModal("Zerar Tudo?", `Isso vai limpar todos os cronômetros da aba "${aba === 'meio' ? 'Meio de Semana' : 'Fim de Semana'}". Tem certeza?`, () => {
-            meetingParts.forEach(p => {
-                const pAba = p.container === 'list-fim' ? 'fim' : 'meio';
-                if(pAba === aba) {
-                    timers[p.id].sec = 0;
-                    timers[p.id].running = false;
-                }
-            });
-            render();
-        });
-    }
-
-    function openAdjustModal(id) {
-        const body = `<input type="number" id="mAdj" placeholder="Minutos passados">`;
-        openModal("Ajuste Manual", body, () => { timers[id].sec = parseInt(document.getElementById('mAdj').value) * 60; render(); });
-    }
-
-    function openHistory() {
-        let body = history.length ? "" : "<p style='text-align:center'>Nenhum registro.</p>";
-        history.slice().reverse().forEach(h => { body += `<div class="history-item"><strong>${h.data}</strong><br>${h.resumo}</div>`; });
-        body += `<button onclick="clearHistory()" class="modal-btn" style="width:100%; margin-top:10px; background:#333; color:white">Limpar Tudo</button>`;
-        openModal("Histórico Recente", `<div style="max-height:300px; overflow-y:auto">${body}</div>`, () => {});
-    }
-    function clearHistory() { history = []; localStorage.setItem('jw_history_v16', JSON.stringify(history)); closeModal(); }
-
-    function saveAll() { localStorage.setItem('jw_parts_v16', JSON.stringify(meetingParts)); render(); }
-    
-    function toggleTimer(id) { 
-        const vaiRodar = !timers[id].running;
-        
-        // Para todos primeiro para garantir a segurança de um por vez
-        Object.keys(timers).forEach(timerId => {
-            timers[timerId].running = false;
-        });
-
-        // Só ativa o selecionado se o objetivo era dar Play
-        timers[id].running = vaiRodar; 
-        
-        render(); 
-    }
-    
-    function toggleConfigMode() { 
-        const isConfig = document.getElementById('body').classList.toggle('config-mode');
-        document.getElementById('config-icon').style.color = isConfig ? 'var(--success-color)' : 'inherit';
-        document.getElementById('config-text').innerText = isConfig ? 'Pronto' : 'Configurar';
-        initDragAndDrop();
-    }
-
-    function toggleAccordion(id, headerElement) { 
+    function toggleAcc(id, el) {
         const content = document.getElementById(id);
-        const icon = headerElement.querySelector('.acc-icon');
+        const icon = el.querySelector('.material-icons');
         content.classList.toggle('open');
         icon.innerText = content.classList.contains('open') ? 'expand_less' : 'expand_more';
     }
 
     function switchTab(t) {
+        currentTab = t;
         document.querySelectorAll('.content, .tab').forEach(e => e.classList.remove('active'));
         document.getElementById(t).classList.add('active');
-        event.currentTarget.classList.add('active');
+        document.getElementById(`tab-btn-${t}`).classList.add('active');
+    }
+
+    function toggleConfig() { 
+        const body = document.getElementById('body');
+        const icon = document.getElementById('config-icon');
+        const label = document.getElementById('config-label');
+        body.classList.toggle('config-mode'); 
+        if(body.classList.contains('config-mode')) {
+            icon.innerText = 'check_circle'; icon.style.color = 'var(--success-color)';
+            label.innerText = 'Confirmar'; label.style.color = 'var(--success-color)';
+        } else {
+            icon.innerText = 'settings'; icon.style.color = '';
+            label.innerText = 'Configurar'; label.style.color = '';
+        }
+    }
+
+    function confirmDelete(id) { openModal("Remover?", "Excluir esta parte definitivamente?", () => { meetingParts = meetingParts.filter(p => p.id !== id); save(); render(); }); }
+    function openEditModal(id) {
+        const p = meetingParts.find(x => x.id === id);
+        const body = `Nome: <input type="text" id="editN" value="${p.nome}"> Meta: <input type="number" id="editM" value="${p.meta}">`;
+        openModal("Editar Parte", body, () => {
+            p.nome = document.getElementById('editN').value;
+            p.meta = parseInt(document.getElementById('editM').value);
+            save(); render();
+        });
+    }
+    function confirmResetPart(id) { openModal("Zerar?", "Reiniciar tempo desta parte?", () => { timers[id].sec = 0; timers[id].running = false; save(); render(); }); }
+    function confirmResetAll(aba) { openModal("Zerar Tudo?", "Zerar todos os cronômetros desta aba?", () => { meetingParts.forEach(p => { if((aba==='fim' && p.container==='list-fim') || (aba==='meio' && p.container!=='list-fim')) { timers[p.id].sec=0; timers[p.id].running=false; } }); save(); render(); }); }
+    function openAdjustModal(id) { openModal("Ajuste Manual", `Minutos passados: <input type="number" id="adjM">`, () => { timers[id].sec = (parseInt(document.getElementById('adjM').value) || 0) * 60; save(); render(); }); }
+
+    function openHistory() {
+        let body = history.length ? "" : "<p style='text-align:center'>Histórico vazio.</p>";
+        history.slice().reverse().forEach(h => { body += `<div style="border-bottom:1px solid #ddd; padding:8px; font-size:0.8rem"><strong>${h.data}</strong><br>${h.resumo}</div>`; });
+        body += `<button onclick="history=[]; localStorage.setItem('jw_history_v24', '[]'); closeModal()" class="modal-btn" style="width:100%; margin-top:10px; background:#333; color:white">Limpar Tudo</button>`;
+        openModal("Histórico Recente", `<div style="max-height:250px; overflow-y:auto">${body}</div>`, () => {});
+    }
+
+    function toggleTheme() {
+        const t = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', t);
     }
 
     setInterval(() => {
-        let changed = false;
-        Object.keys(timers).forEach(id => { 
-            if(timers[id].running) { 
-                timers[id].sec++; 
-                updateDisplay(id); 
-                changed = true;
+        Object.keys(timers).forEach(id => {
+            if(timers[id].running) {
+                timers[id].sec++;
+                updateDisplay(id);
+                updateTotals();
+                const p = meetingParts.find(x => x.id === id);
+                if(p && timers[id].sec === p.meta * 60 - 60) navigator.vibrate?.(200);
+                if(p && timers[id].sec === p.meta * 60) navigator.vibrate?.([400, 200, 400]);
             }
         });
-        if(changed) {
-            updateTotal();
-            localStorage.setItem('jw_timers_v16', JSON.stringify(timers));
-        }
     }, 1000);
 
     function sendWhatsApp() {
-        const abaAtiva = document.querySelector('.content.active').id;
-        let txt = "*⏱️ TEMPO DAS PARTES*\n\n";
-        let resumoHistorico = "";
+        const meetingName = currentTab === 'meio' ? "MEIO DE SEMANA" : "FIM DE SEMANA";
+        let txt = `*⏱️ TEMPO DAS PARTES*\n*(${meetingName})*\n\n`;
+        let lastLabel = "";
+        let hasData = false;
+        let resumoHist = "";
 
-        if (abaAtiva === 'meio') {
-            const secoes = [
-                { id: "acc-tesouros", titulo: "TESOUROS DA PALAVRA" },
-                { id: "acc-ministerio", titulo: "FAÇA SEU MELHOR" },
-                { id: "acc-vida", titulo: "NOSSA VIDA CRISTÃ" }
-            ];
-
-            secoes.forEach(sec => {
-                const partesSecao = meetingParts.filter(p => p.container === sec.id);
-                if (partesSecao.length > 0) {
-                    txt += `• *${sec.titulo}*\n`;
-                    partesSecao.forEach(p => {
-                        const time = document.getElementById(`disp-${p.id}`).innerText;
-                        txt += `${p.nome}: ${time}\n`;
-                        resumoHistorico += `${p.nome}: ${time} | `;
-                    });
-                    txt += "\n";
+        meetingParts.forEach(p => {
+            // Verifica se a parte pertence à aba atual e se tem tempo
+            const isCorrectAba = (currentTab === 'fim' && p.container === 'list-fim') || (currentTab === 'meio' && p.container !== 'list-fim');
+            
+            if(isCorrectAba && timers[p.id].sec > 0) {
+                hasData = true;
+                if(p.label !== lastLabel) {
+                    txt += `\n*${p.label}*\n`;
+                    lastLabel = p.label;
                 }
-            });
-            txt += `*TEMPO TOTAL DA REUNIÃO: ${document.getElementById('total-meio').innerText}*`;
-        } else {
-            meetingParts.filter(p => p.container === 'list-fim').forEach(p => {
-                const time = document.getElementById(`disp-${p.id}`).innerText;
-                txt += `*${p.nome}:* ${time}\n`;
-                resumoHistorico += `${p.nome}: ${time} | `;
-            });
-            txt += `\n*TEMPO TOTAL DA REUNIÃO: ${document.getElementById('total-fim').innerText}*`;
+                const time = formatTime(timers[p.id].sec);
+                const name = participants[p.id] ? ` (${participants[p.id]})` : "";
+                txt += `• ${p.nome}${name}: ${time}\n`;
+                resumoHist += `${p.nome}: ${time} | `;
+            }
+        });
+
+        if(!hasData) {
+            openModal("Aviso", `Não há tempos registrados na aba ${meetingName} para compartilhar.`, () => {}, false);
+            return;
         }
 
         const agora = new Date();
-        history.push({ data: agora.toLocaleDateString() + " " + agora.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}), resumo: resumoHistorico });
-        localStorage.setItem('jw_history_v16', JSON.stringify(history));
-        window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(txt.trim()), '_blank');
+        history.push({ data: agora.toLocaleDateString() + " " + agora.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}), resumo: resumoHist });
+        localStorage.setItem('jw_history_v24', JSON.stringify(history));
+        window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(txt));
     }
 
-    initTheme();
     render();
 </script>
 </body>
