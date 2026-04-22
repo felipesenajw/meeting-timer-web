@@ -22,101 +22,94 @@
             --ministerio: #b38f00;
             --vida-crista: #9e2a2b;
             --danger-color: #dc3545;
-            --warning-color: #ffc107;
             --success-color: #28a745;
-            --bg-color: #f0f2f5;
-            --card-bg: #ffffff;
-            --text-color: #333333;
-            --border-color: #dddddd;
-            --nav-bg: #ffffff;
+            --bg-color: #f8f9fa;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --text-color: #2d3436;
+            --border-color: rgba(0,0,0,0.1);
+            --nav-bg: rgba(255, 255, 255, 0.98);
         }
 
         [data-theme="dark"] {
-            --bg-color: #121212;
-            --card-bg: #1e1e1e;
-            --text-color: #e0e0e0;
-            --border-color: #333333;
-            --nav-bg: #1e1e1e;
-            --primary-color: #a584e0;
+            --bg-color: #0f0f0f;
+            --card-bg: rgba(35, 35, 35, 0.95);
+            --text-color: #f1f2f6;
+            --border-color: rgba(255,255,255,0.1);
+            --nav-bg: rgba(20, 20, 20, 0.98);
+            --primary-color: #bb93ff;
         }
 
         * { font-family: 'Ubuntu', sans-serif; -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
-        body { background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 10px; padding-bottom: 140px; transition: 0.3s; }
-        .container { max-width: 500px; margin: auto; background: var(--card-bg); padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         
-        h2 { color: var(--primary-color); text-align: center; font-size: 1.5rem; margin-bottom: 15px; font-weight: 700; }
+        body { background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 10px; padding-bottom: 140px; overflow-x: hidden; }
 
-        .tabs { display: flex; border-radius: 8px; overflow: hidden; margin-bottom: 15px; border: 1px solid var(--primary-color); }
-        .tab { flex: 1; padding: 12px; text-align: center; cursor: pointer; background: transparent; font-weight: 500; font-size: 0.9rem; border: none; color: var(--text-color); }
-        .tab.active { background: var(--primary-color); color: white; }
+        .container { max-width: 500px; margin: auto; }
+        h2 { color: var(--primary-color); text-align: center; font-size: 1.4rem; margin: 15px 0; font-weight: 700; }
 
-        .content { display: none; }
-        .content.active { display: block; }
+        .tabs { display: flex; border-radius: 12px; background: var(--border-color); padding: 4px; gap: 4px; margin-bottom: 20px; }
+        .tab { flex: 1; padding: 12px; text-align: center; cursor: pointer; border-radius: 8px; font-weight: 500; font-size: 0.85rem; border: none; color: var(--text-color); background: transparent; transition: 0.2s; }
+        .tab.active { background: var(--primary-color); color: #ffffff !important; }
 
-        .accordion { margin-bottom: 10px; border-radius: 8px; overflow: hidden; border: 1px solid var(--border-color); }
-        .accordion-header { padding: 12px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; color: white; font-weight: 500; font-size: 0.85rem; }
-        .accordion-content { display: none; padding: 10px; background: var(--card-bg); min-height: 20px; }
+        /* Efeito de Transição Suave */
+        .content { display: none; opacity: 0; transform: translateY(10px); transition: opacity 0.3s ease, transform 0.3s ease; }
+        .content.active { display: block; opacity: 1; transform: translateY(0); }
+
+        .accordion { margin-bottom: 12px; border-radius: 15px; overflow: hidden; border: 1px solid var(--border-color); }
+        .accordion-header { padding: 14px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; color: white; font-weight: 700; font-size: 0.8rem; }
+        .accordion-content { display: none; padding: 12px; }
         .accordion-content.open { display: block; }
 
-        .part-card { background: var(--card-bg); border: 1px solid var(--border-color); padding: 12px; border-radius: 8px; margin-bottom: 15px; border-left: 5px solid #ccc; position: relative; }
-        
-        .drag-handle { display: none; align-items: center; gap: 5px; margin-bottom: 5px; color: var(--text-color); opacity: 0.7; }
-        .config-mode .drag-handle { display: flex; cursor: grab; }
+        .part-card { background: var(--card-bg); border: 1px solid var(--border-color); padding: 15px; border-radius: 14px; margin-bottom: 15px; border-left: 6px solid #ccc; position: relative; }
+        .progress-bar { position: absolute; top: 0; left: 0; height: 3px; background: var(--primary-color); border-radius: 3px 3px 0 0; opacity: 0.5; }
+        .status-led { position: absolute; top: 12px; right: 12px; width: 8px; height: 8px; border-radius: 50%; background: var(--success-color); display: none; box-shadow: 0 0 8px var(--success-color); }
+        .running .status-led { display: block; animation: pulseLed 1.5s infinite; }
+        @keyframes pulseLed { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+
+        .drag-handle { display: none; align-items: center; gap: 8px; margin-bottom: 8px; cursor: grab; padding: 5px; background: var(--bg-color); border-radius: 6px; }
+        .config-mode .drag-handle { display: flex; }
 
         .color-tesouros { border-left-color: var(--tesouros); }
         .color-ministerio { border-left-color: var(--ministerio); }
         .color-vida-crista { border-left-color: var(--vida-crista); }
         .color-fim { border-left-color: var(--primary-color); }
 
-        /* Estilo do Input para facilitar o toque */
-        .participant-input { 
-            width: 100%; 
-            border: none; 
-            border-bottom: 1px dashed #ccc; 
-            background: transparent; 
-            color: var(--text-color); 
-            font-size: 0.9rem; 
-            margin-top: 8px; 
-            padding: 5px 0;
-            outline: none; 
-            position: relative;
-            z-index: 50; /* Garante que fique acima de camadas de arraste */
-        }
+        .participant-input { width: 100%; border: none; border-bottom: 1px solid var(--border-color); background: transparent; color: var(--text-color); font-size: 0.95rem; margin-top: 5px; padding: 8px 0; outline: none; }
 
-        .timer-row { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
-        .timer-display { font-size: 1.8rem; font-weight: 700; cursor: pointer; }
-        .controls { display: flex; gap: 8px; }
-        .icon-btn { border: none; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; color: white; z-index: 10; }
-        .btn-play { background: var(--success-color); }
+        .timer-row { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; }
+        .timer-display { font-size: 2rem; font-weight: 700; }
+        .controls { display: flex; gap: 10px; }
+        
+        .icon-btn { border: none; width: 46px; height: 46px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: white; transition: 0.1s; }
+        .icon-btn:active { transform: scale(0.9); }
+        .btn-play { background: var(--primary-color); }
         .btn-pause { background: var(--danger-color); }
-        .btn-reset { background: #6c757d; }
+        .btn-reset { background: transparent; color: var(--text-color); border: 1px solid var(--border-color); }
 
-        .btn-config-action { width: 36px; height: 36px; position: absolute; display: none; border-radius: 50%; border: none; color: white; cursor: pointer; align-items: center; justify-content: center; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
-        .btn-delete { background: #333; top: -12px; right: -12px; }
-        .btn-edit { background: var(--primary-color); top: -12px; right: 30px; }
-        
+        .btn-config-action { width: 34px; height: 34px; position: absolute; display: none; border-radius: 10px; border: none; color: white; align-items: center; justify-content: center; z-index: 10; }
+        .btn-delete { background: #333; top: -10px; right: -10px; }
+        .btn-edit { background: var(--primary-color); top: -10px; right: 30px; }
         .config-mode .btn-config-action { display: flex; }
-        .config-mode .timer-row, .config-mode .participant-input { opacity: 0.1; pointer-events: none; }
+        .config-mode .main-content { opacity: 0.2; pointer-events: none; }
 
-        .total-box { margin-top: 20px; padding: 15px; background: rgba(90, 61, 141, 0.05); border-radius: 8px; border: 1px dashed var(--primary-color); text-align: center; }
-        .total-value { font-size: 1.6rem; font-weight: 700; margin-bottom: 8px; display: block; }
+        /* Ajuste do Tempo Total da Reunião */
+        .total-box { margin-top: 25px; padding: 25px; background: var(--card-bg); border-radius: 18px; border: 1px solid var(--border-color); text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .total-label { font-size: 0.7rem; font-weight: 700; opacity: 0.6; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+        .total-value { font-size: 2.8rem; font-weight: 700; color: var(--primary-color); letter-spacing: -2px; line-height: 1; }
         
-        .action-group { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
-        .btn-reset-all { width: 100%; padding: 12px; background: transparent; border: 1px solid var(--danger-color); color: var(--danger-color); border-radius: 8px; font-weight: 700; font-size: 0.75rem; cursor: pointer; text-transform: uppercase; }
-        .btn-clear-names { width: 100%; padding: 12px; background: transparent; border: 1px solid #6c757d; color: #6c757d; border-radius: 8px; font-weight: 700; font-size: 0.75rem; cursor: pointer; text-transform: uppercase; }
+        .btn-reset-all { width: 100%; padding: 12px; background: transparent; border: 1px solid var(--danger-color); color: var(--danger-color); border-radius: 10px; font-weight: 700; cursor: pointer; margin-top: 20px; }
+        .btn-clear-names { width: 100%; padding: 12px; background: transparent; border: 1px solid var(--border-color); color: var(--text-color); opacity: 0.5; border-radius: 12px; font-weight: 600; cursor: pointer; margin-top: 15px; }
 
-        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--nav-bg); border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; padding: 10px 0; z-index: 200; }
-        .nav-item { background: none; border: none; color: var(--text-color); cursor: pointer; display: flex; flex-direction: column; align-items: center; font-size: 0.75rem; }
-        
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 3000; justify-content: center; align-items: center; }
-        .modal { background: var(--card-bg); color: var(--text-color); padding: 20px; border-radius: 15px; width: 85%; max-width: 350px; }
-        .modal input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-color); color: var(--text-color); }
-        .modal-footer { display: flex; gap: 10px; margin-top: 15px; }
-        .modal-btn { flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--nav-bg); border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; padding: 12px 0; z-index: 2000; border-radius: 20px 20px 0 0; }
+        .nav-item { background: none; border: none; color: var(--text-color); cursor: pointer; display: flex; flex-direction: column; align-items: center; font-size: 0.7rem; }
+        .nav-item.active-mode { color: var(--success-color); font-weight: 700; }
 
-        .sortable-ghost { opacity: 0.3; background: var(--primary-color) !important; }
-        .alert-danger { background: rgba(220, 53, 69, 0.1); border-color: var(--danger-color); }
-        .alert-warning { background: rgba(255, 193, 7, 0.1); border-color: var(--warning-color); }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; padding: 20px; }
+        .modal { background: var(--card-bg); color: var(--text-color); padding: 25px; border-radius: 20px; width: 100%; max-width: 350px; border: 1px solid var(--border-color); }
+        .modal input { width: 100%; padding: 12px; margin: 15px 0; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-color); color: var(--text-color); }
+        .modal-footer { display: flex; gap: 10px; margin-top: 10px; }
+        .modal-btn { flex: 1; padding: 14px; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; }
+
+        .alert-danger { background: rgba(220, 53, 69, 0.1) !important; border-color: var(--danger-color); }
     </style>
 </head>
 <body id="body">
@@ -143,25 +136,21 @@
             <div id="acc-vida" class="accordion-content sortable-list" data-container="acc-vida"></div>
         </div>
         <div class="total-box">
-            <span style="font-size: 0.7rem; font-weight:700; color:var(--primary-color)">TOTAL DA REUNIÃO</span>
+            <span class="total-label">Tempo Total da Reunião</span>
             <span class="total-value" id="total-meio">00:00</span>
-            <button class="btn-reset-all" onclick="confirmResetAll('meio')">Zerar Cronômetros da Aba</button>
+            <button class="btn-reset-all" onclick="confirmResetAll('meio')">Zerar Cronômetros</button>
         </div>
-        <div class="action-group">
-            <button class="btn-clear-names" onclick="confirmClearNames('meio')">Limpar Todos os Nomes</button>
-        </div>
+        <button class="btn-clear-names" onclick="confirmResetTabContent('meio')">Resetar Aba (Nomes e Temas)</button>
     </div>
 
     <div id="fim" class="content">
-        <div id="list-fim" class="sortable-list" data-container="list-fim" style="min-height: 50px;"></div>
+        <div id="list-fim" class="sortable-list" data-container="list-fim"></div>
         <div class="total-box">
-            <span style="font-size: 0.7rem; font-weight:700; color:var(--primary-color)">TOTAL DA REUNIÃO</span>
+            <span class="total-label">Tempo Total da Reunião</span>
             <span class="total-value" id="total-fim">00:00</span>
-            <button class="btn-reset-all" onclick="confirmResetAll('fim')">Zerar Cronômetros da Aba</button>
+            <button class="btn-reset-all" onclick="confirmResetAll('fim')">Zerar Cronômetros</button>
         </div>
-        <div class="action-group">
-            <button class="btn-clear-names" onclick="confirmClearNames('fim')">Limpar Todos os Nomes</button>
-        </div>
+        <button class="btn-clear-names" onclick="confirmResetTabContent('fim')">Resetar Aba (Nomes e Temas)</button>
     </div>
 </div>
 
@@ -169,18 +158,18 @@
     <button class="nav-item" onclick="openHistory()"><span class="material-icons">history</span>Histórico</button>
     <button class="nav-item" onclick="toggleTheme()"><span class="material-icons">brightness_6</span>Tema</button>
     <button class="nav-item" onclick="toggleConfig()" id="btn-config-nav">
-        <span class="material-icons" id="config-icon">settings</span>
-        <span id="config-label">Configurar</span>
+        <span class="material-icons" id="config-icon">tune</span>
+        <span id="config-label">Ajustar</span>
     </button>
-    <button class="nav-item" onclick="sendWhatsApp()" style="color:var(--success-color)"><span class="material-icons">share</span>Compartilhar</button>
+    <button class="nav-item" onclick="sendWhatsApp()" style="color:var(--success-color)"><span class="material-icons">share</span>Enviar</button>
 </nav>
 
 <div id="customModal" class="modal-overlay">
     <div class="modal">
         <h3 id="modalTitle" style="margin-top:0">Aviso</h3>
-        <div id="modalBody"></div>
+        <div id="modalBody" style="font-size:0.9rem"></div>
         <div class="modal-footer">
-            <button class="modal-btn" id="modalCancelBtn" style="background:#666; color:white" onclick="closeModal()">Cancelar</button>
+            <button class="modal-btn" id="modalCancelBtn" onclick="closeModal()" style="background:#eee; color:#333">Cancelar</button>
             <button class="modal-btn" style="background:var(--primary-color); color:white" id="modalConfirmBtn">Confirmar</button>
         </div>
     </div>
@@ -200,30 +189,26 @@
         { id: "p10", nome: "Estudo de A Sentinela", meta: 60, container: "list-fim", cor: "color-fim", label: "📢 FIM DE SEMANA" }
     ];
 
-    let meetingParts = JSON.parse(localStorage.getItem('jw_parts_v31')) || defaultParts;
-    let timers = JSON.parse(localStorage.getItem('jw_timers_v31')) || {};
-    let participants = JSON.parse(localStorage.getItem('jw_names_v31')) || {};
-    let history = JSON.parse(localStorage.getItem('jw_history_v31')) || [];
+    let meetingParts = JSON.parse(localStorage.getItem('jw_parts_v37')) || [...defaultParts];
+    let timers = JSON.parse(localStorage.getItem('jw_timers_v37')) || {};
+    let participants = JSON.parse(localStorage.getItem('jw_names_v37')) || {};
+    let history = JSON.parse(localStorage.getItem('jw_history_v37')) || [];
     let currentTab = 'meio';
 
     function render() {
         document.querySelectorAll('.sortable-list').forEach(c => {
             c.innerHTML = "";
             new Sortable(c, {
-                animation: 150,
-                ghostClass: 'sortable-ghost',
+                animation: 200, handle: '.drag-handle',
                 disabled: !document.getElementById('body').classList.contains('config-mode'),
-                filter: '.participant-input, button', // Ignora inputs e botões para o arraste
-                preventOnFilter: false, // Permite o evento nativo (como focar no input)
-                onEnd: function() {
+                onEnd: () => {
                     const newOrder = [];
                     document.querySelectorAll('.part-card').forEach(card => {
                         const id = card.id.replace('card-', '');
                         const part = meetingParts.find(p => p.id === id);
                         if(part) newOrder.push(part);
                     });
-                    const missingParts = meetingParts.filter(p => !newOrder.find(no => no.id === p.id));
-                    meetingParts = [...newOrder, ...missingParts];
+                    meetingParts = [...newOrder];
                     save();
                 }
             });
@@ -233,29 +218,22 @@
             if (!timers[p.id]) timers[p.id] = { sec: 0, running: false };
             const container = document.querySelector(`[data-container="${p.container}"]`);
             if(!container) return;
+            const isRunning = timers[p.id].running;
             container.innerHTML += `
-                <div class="part-card ${p.cor}" id="card-${p.id}">
+                <div class="part-card ${p.cor} ${isRunning ? 'running' : ''}" id="card-${p.id}">
+                    <div class="progress-bar" id="prog-${p.id}"></div>
+                    <div class="status-led"></div>
                     <button class="btn-config-action btn-delete" onclick="confirmDelete('${p.id}')"><span class="material-icons">delete</span></button>
                     <button class="btn-config-action btn-edit" onclick="openEditModal('${p.id}')"><span class="material-icons">edit</span></button>
-                    
-                    <div class="drag-handle">
-                        <span class="material-icons">drag_indicator</span>
-                        <div style="font-weight:700; font-size: 0.9rem">${p.nome} <span style="font-size:0.7rem; opacity:0.6">(${p.meta} min)</span></div>
-                    </div>
-
+                    <div class="drag-handle"><span class="material-icons">drag_indicator</span><span style="font-size:0.8rem"> Mover: ${p.nome}</span></div>
                     <div class="main-content">
-                        <div class="part-info-static" style="font-weight:700; font-size:0.9rem; margin-bottom:5px; ${document.getElementById('body').classList.contains('config-mode') ? 'display:none' : ''}">
-                            ${p.nome} <span style="font-size:0.7rem; opacity:0.6">(${p.meta} min)</span>
-                        </div>
-                        <input type="text" class="participant-input" placeholder="Participante..." 
-                            value="${participants[p.id] || ''}" oninput="saveName('${p.id}', this.value)">
+                        <div style="font-weight:700; font-size:0.8rem; opacity:0.6">${p.nome} (${p.meta} min)</div>
+                        <input type="text" class="participant-input" placeholder="Participante..." value="${participants[p.id] || ''}" oninput="saveName('${p.id}', this.value)">
                         <div class="timer-row">
                             <div class="timer-display" onclick="openAdjustModal('${p.id}')" id="disp-${p.id}">00:00</div>
                             <div class="controls">
-                                <button class="icon-btn ${timers[p.id].running ? 'btn-pause' : 'btn-play'}" onclick="toggleTimer('${p.id}')">
-                                    <span class="material-icons">${timers[p.id].running ? 'pause' : 'play_arrow'}</span>
-                                </button>
-                                <button class="icon-btn btn-reset" onclick="confirmResetPart('${p.id}')"><span class="material-icons">replay</span></button>
+                                <button class="icon-btn ${isRunning ? 'btn-pause' : 'btn-play'}" onclick="toggleTimer('${p.id}')"><span class="material-icons">${isRunning ? 'pause' : 'play_arrow'}</span></button>
+                                <button class="icon-btn btn-reset" onclick="confirmResetPart('${p.id}')"><span class="material-icons">refresh</span></button>
                             </div>
                         </div>
                     </div>
@@ -267,26 +245,24 @@
 
     function toggleTimer(id) {
         const state = !timers[id].running;
-        Object.keys(timers).forEach(k => timers[k].running = false);
+        if(state) Object.keys(timers).forEach(k => timers[k].running = false);
         timers[id].running = state;
         save(); render();
     }
 
-    function saveName(id, val) { participants[id] = val; localStorage.setItem('jw_names_v31', JSON.stringify(participants)); }
-    function save() { localStorage.setItem('jw_timers_v31', JSON.stringify(timers)); localStorage.setItem('jw_parts_v31', JSON.stringify(meetingParts)); }
+    function saveName(id, val) { participants[id] = val; localStorage.setItem('jw_names_v37', JSON.stringify(participants)); }
+    function save() { localStorage.setItem('jw_timers_v37', JSON.stringify(timers)); localStorage.setItem('jw_parts_v37', JSON.stringify(meetingParts)); }
 
     function updateDisplay(id) {
         const p = meetingParts.find(x => x.id === id);
         if(!p) return;
         const sec = timers[id].sec;
         const el = document.getElementById(`disp-${id}`);
+        const prog = document.getElementById(`prog-${id}`);
         const card = document.getElementById(`card-${id}`);
         if(el) el.innerText = formatTime(sec);
-        if(card) {
-            card.classList.remove('alert-warning', 'alert-danger');
-            if(sec >= p.meta * 60) card.classList.add('alert-danger');
-            else if(sec >= (p.meta * 60 - 60) && sec > 0) card.classList.add('alert-warning');
-        }
+        if(prog) prog.style.width = Math.min((sec / (p.meta * 60)) * 100, 100) + "%";
+        if(card) card.classList.toggle('alert-danger', sec >= p.meta * 60);
     }
 
     function updateTotals() {
@@ -310,56 +286,29 @@
 
     function switchTab(t) {
         currentTab = t;
-        document.querySelectorAll('.content, .tab').forEach(e => e.classList.remove('active'));
-        document.getElementById(t).classList.add('active');
-        document.getElementById(`tab-btn-${t}`).classList.add('active');
+        const tabs = ['meio', 'fim'];
+        tabs.forEach(tab => {
+            const el = document.getElementById(tab);
+            const btn = document.getElementById(`tab-btn-${tab}`);
+            if(tab === t) {
+                el.classList.add('active');
+                btn.classList.add('active');
+            } else {
+                el.classList.remove('active');
+                btn.classList.remove('active');
+            }
+        });
     }
 
     function toggleConfig() { 
         const body = document.getElementById('body');
         body.classList.toggle('config-mode'); 
         const isConfig = body.classList.contains('config-mode');
-        document.getElementById('config-icon').innerText = isConfig ? 'check_circle' : 'settings';
-        document.getElementById('config-label').innerText = isConfig ? 'Pronto' : 'Configurar';
+        document.getElementById('config-icon').innerText = isConfig ? 'check_circle' : 'tune';
+        document.getElementById('config-label').innerText = isConfig ? 'Confirmar' : 'Ajustar';
+        document.getElementById('btn-config-nav').classList.toggle('active-mode', isConfig);
         render();
     }
-
-    function confirmDelete(id) { openModal("Remover?", "Excluir esta parte?", () => { meetingParts = meetingParts.filter(p => p.id !== id); save(); render(); }); }
-    function openEditModal(id) {
-        const p = meetingParts.find(x => x.id === id);
-        openModal("Editar Parte", `Nome: <input type="text" id="editN" value="${p.nome}"> Meta: <input type="number" id="editM" value="${p.meta}">`, () => {
-            p.nome = document.getElementById('editN').value;
-            p.meta = parseInt(document.getElementById('editM').value);
-            save(); render();
-        });
-    }
-
-    function confirmResetPart(id) { openModal("Zerar?", "Reiniciar cronômetro?", () => { timers[id].sec = 0; timers[id].running = false; save(); render(); }); }
-    
-    function confirmResetAll(aba) { 
-        openModal("Zerar Aba?", "Zerar todos os tempos desta aba?", () => { 
-            meetingParts.forEach(p => { 
-                if((aba==='fim' && p.container==='list-fim') || (aba==='meio' && p.container!=='list-fim')) { 
-                    timers[p.id].sec=0; timers[p.id].running=false; 
-                } 
-            }); 
-            save(); render(); 
-        }); 
-    }
-
-    function confirmClearNames(aba) {
-        openModal("Limpar Nomes?", "Isso apagará todos os nomes desta aba. Confirmar?", () => {
-            meetingParts.forEach(p => {
-                if((aba==='fim' && p.container==='list-fim') || (aba==='meio' && p.container!=='list-fim')) {
-                    participants[p.id] = "";
-                }
-            });
-            localStorage.setItem('jw_names_v31', JSON.stringify(participants));
-            render();
-        });
-    }
-
-    function openAdjustModal(id) { openModal("Ajustar", `Minutos: <input type="number" id="adjM">`, () => { timers[id].sec = (parseInt(document.getElementById('adjM').value) || 0) * 60; save(); render(); }); }
 
     function openModal(title, body, confirmFn, showCancel = true) {
         document.getElementById('modalTitle').innerText = title;
@@ -370,15 +319,40 @@
     }
     function closeModal() { document.getElementById('customModal').style.display = 'none'; }
 
+    function confirmDelete(id) { openModal("Remover?", "Excluir esta parte?", () => { meetingParts = meetingParts.filter(p => p.id !== id); save(); render(); }); }
+    function openEditModal(id) {
+        const p = meetingParts.find(x => x.id === id);
+        openModal("Editar Parte", `Nome: <input type="text" id="editN" value="${p.nome}"> Meta: <input type="number" id="editM" value="${p.meta}">`, () => {
+            p.nome = document.getElementById('editN').value; p.meta = parseInt(document.getElementById('editM').value); save(); render();
+        });
+    }
+
+    function confirmResetPart(id) { openModal("Zerar?", "Reiniciar tempo desta parte?", () => { timers[id].sec = 0; timers[id].running = false; save(); render(); }); }
+    function confirmResetAll(aba) { openModal("Zerar Tudo?", "Reiniciar todos os tempos desta aba?", () => { meetingParts.forEach(p => { if((aba==='fim' && p.container==='list-fim') || (aba==='meio' && p.container!=='list-fim')) { timers[p.id].sec=0; timers[p.id].running=false; } }); save(); render(); }); }
+
+    function confirmResetTabContent(aba) {
+        openModal("Resetar Aba?", "Limpar nomes e voltar temas ao padrão?", () => {
+            meetingParts.forEach(p => {
+                if((aba === 'fim' && p.container === 'list-fim') || (aba === 'meio' && p.container !== 'list-fim')) {
+                    participants[p.id] = "";
+                    const original = defaultParts.find(dp => dp.id === p.id);
+                    if(original) { p.nome = original.nome; p.meta = original.meta; }
+                }
+            });
+            save(); render();
+        });
+    }
+
+    function openAdjustModal(id) { openModal("Ajustar", `Minutos: <input type="number" id="adjM" placeholder="Ex: 5">`, () => { timers[id].sec = (parseInt(document.getElementById('adjM').value) || 0) * 60; save(); render(); }); }
+
     function openHistory() {
-        let body = history.length ? "" : "<p>Vazio.</p>";
-        history.slice().reverse().forEach(h => { body += `<div style="border-bottom:1px solid #ddd; padding:8px; font-size:0.8rem"><strong>${h.data}</strong><br>${h.resumo}</div>`; });
-        openModal("Histórico", `<div style="max-height:250px; overflow-y:auto">${body}</div>`, () => {});
+        let body = history.length ? "" : "<p style='text-align:center; opacity:0.5'>Sem registros.</p>";
+        history.slice().reverse().slice(0,10).forEach(h => { body += `<div style="border-bottom:1px solid var(--border-color); padding:10px 0; font-size:0.8rem"><strong>${h.data}</strong><br>${h.resumo}</div>`; });
+        openModal("Histórico Recente", `<div style="max-height:200px; overflow-y:auto">${body}</div>`, () => {}, false);
     }
 
     function toggleTheme() {
-        const t = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-        document.documentElement.setAttribute('data-theme', t);
+        document.documentElement.setAttribute('data-theme', document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
     }
 
     setInterval(() => {
@@ -388,33 +362,29 @@
                 updateDisplay(id);
                 updateTotals();
                 const p = meetingParts.find(x => x.id === id);
-                if(p && timers[id].sec === p.meta * 60 - 60) navigator.vibrate?.(200);
-                if(p && timers[id].sec === p.meta * 60) navigator.vibrate?.([400, 200, 400]);
+                if(p && (timers[id].sec === p.meta * 60 - 60 || timers[id].sec === p.meta * 60)) navigator.vibrate?.(200);
             }
         });
     }, 1000);
 
     function sendWhatsApp() {
-        const meetingName = currentTab === 'meio' ? "MEIO DE SEMANA" : "FIM DE SEMANA";
-        let txt = `*⏱️ TEMPO DAS PARTES*\n*(${meetingName})*\n\n`;
-        let lastLabel = "";
+        let txt = `*⏱️ RELATÓRIO DE TEMPO*\n\n`;
         let hasData = false;
-        let resumoHist = "";
+        let resumo = "";
         meetingParts.forEach(p => {
             if((currentTab === 'fim' && p.container === 'list-fim') || (currentTab === 'meio' && p.container !== 'list-fim')) {
                 if(timers[p.id].sec > 0) {
                     hasData = true;
-                    if(p.label !== lastLabel) { txt += `\n*${p.label}*\n`; lastLabel = p.label; }
                     const time = formatTime(timers[p.id].sec);
-                    txt += `• ${p.nome}${participants[p.id] ? " ("+participants[p.id]+")" : ""}: ${time}\n`;
-                    resumoHist += `${p.nome}: ${time} | `;
+                    txt += `• ${p.nome}: ${time}\n`;
+                    resumo += `${p.nome}: ${time} | `;
                 }
             }
         });
-        if(!hasData) { openModal("Aviso", "Não há tempos registrados.", () => {}, false); return; }
+        if(!hasData) { openModal("Aviso", "Nenhum tempo registrado nesta aba para enviar.", () => {}, false); return; }
         const agora = new Date();
-        history.push({ data: agora.toLocaleDateString() + " " + agora.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}), resumo: resumoHist });
-        localStorage.setItem('jw_history_v31', JSON.stringify(history));
+        history.push({ data: agora.toLocaleString(), resumo: resumo });
+        localStorage.setItem('jw_history_v37', JSON.stringify(history));
         window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(txt));
     }
 
