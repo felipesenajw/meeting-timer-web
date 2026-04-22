@@ -87,15 +87,18 @@
         .btn-config-action { width: 34px; height: 34px; position: absolute; display: none; border-radius: 10px; border: none; color: white; align-items: center; justify-content: center; z-index: 10; }
         .btn-delete { background: #333; top: -10px; right: -10px; }
         .btn-edit { background: var(--primary-color); top: -10px; right: 30px; }
+        
+        /* Controle de visibilidade via classe no body */
         .config-mode .btn-config-action { display: flex; }
         .config-mode .main-content { opacity: 0.2; pointer-events: none; }
-
+        
         .btn-add-part { 
             width: 100%; padding: 10px; background: transparent; border: 2px dashed var(--border-color); 
             color: var(--text-color); border-radius: 12px; font-weight: 600; font-size: 0.75rem; 
-            cursor: pointer; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 8px;
+            cursor: pointer; margin-bottom: 20px; display: none; align-items: center; justify-content: center; gap: 8px;
             opacity: 0.7; transition: 0.2s;
         }
+        .config-mode .btn-add-part { display: flex; }
 
         .total-box { margin-top: 25px; padding: 25px; background: var(--card-bg); border-radius: 18px; border: 1px solid var(--border-color); text-align: center; display: flex; flex-direction: column; align-items: center; }
         .total-label { font-size: 0.7rem; font-weight: 700; opacity: 0.6; text-transform: uppercase; margin-bottom: 8px; }
@@ -219,10 +222,10 @@
         { id: "p10", nome: "Estudo de A Sentinela", meta: 60, container: "list-fim", cor: "color-fim" }
     ];
 
-    let meetingParts = JSON.parse(localStorage.getItem('jw_parts_v39')) || [...defaultParts];
-    let timers = JSON.parse(localStorage.getItem('jw_timers_v39')) || {};
-    let participants = JSON.parse(localStorage.getItem('jw_names_v39')) || {};
-    let history = JSON.parse(localStorage.getItem('jw_history_v39')) || [];
+    let meetingParts = JSON.parse(localStorage.getItem('jw_parts_v40')) || [...defaultParts];
+    let timers = JSON.parse(localStorage.getItem('jw_timers_v40')) || {};
+    let participants = JSON.parse(localStorage.getItem('jw_names_v40')) || {};
+    let history = JSON.parse(localStorage.getItem('jw_history_v40')) || [];
     let currentTab = 'meio';
 
     function render() {
@@ -305,8 +308,8 @@
         save(); render();
     }
 
-    function saveName(id, val) { participants[id] = val; localStorage.setItem('jw_names_v39', JSON.stringify(participants)); }
-    function save() { localStorage.setItem('jw_timers_v39', JSON.stringify(timers)); localStorage.setItem('jw_parts_v39', JSON.stringify(meetingParts)); }
+    function saveName(id, val) { participants[id] = val; localStorage.setItem('jw_names_v40', JSON.stringify(participants)); }
+    function save() { localStorage.setItem('jw_timers_v40', JSON.stringify(timers)); localStorage.setItem('jw_parts_v40', JSON.stringify(meetingParts)); }
 
     function updateDisplay(id) {
         const p = meetingParts.find(x => x.id === id);
@@ -425,7 +428,7 @@
         if(!hasData) { openModal("Aviso", "Nenhum tempo registrado para enviar.", () => {}, false); return; }
         const agora = new Date();
         history.push({ data: agora.toLocaleString(), resumo: resumo });
-        localStorage.setItem('jw_history_v39', JSON.stringify(history));
+        localStorage.setItem('jw_history_v40', JSON.stringify(history));
         window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(txt));
     }
 
