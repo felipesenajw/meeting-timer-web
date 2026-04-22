@@ -13,6 +13,7 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
 
     <style>
         :root {
@@ -54,10 +55,16 @@
 
         .accordion { margin-bottom: 10px; border-radius: 8px; overflow: hidden; border: 1px solid var(--border-color); }
         .accordion-header { padding: 12px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; color: white; font-weight: 500; font-size: 0.85rem; }
-        .accordion-content { display: none; padding: 10px; background: var(--card-bg); }
+        .accordion-content { display: none; padding: 10px; background: var(--card-bg); min-height: 20px; }
         .accordion-content.open { display: block; }
 
-        .part-card { background: var(--card-bg); border: 1px solid var(--border-color); padding: 12px; border-radius: 8px; margin-bottom: 8px; border-left: 5px solid #ccc; position: relative; }
+        /* Card e Handle */
+        .part-card { background: var(--card-bg); border: 1px solid var(--border-color); padding: 12px; border-radius: 8px; margin-bottom: 15px; border-left: 5px solid #ccc; position: relative; }
+        
+        .drag-handle { display: none; align-items: center; gap: 5px; margin-bottom: 5px; color: var(--text-color); opacity: 0.7; }
+        .config-mode .drag-handle { display: flex; cursor: grab; }
+        .config-mode .part-card { cursor: grab; }
+
         .color-tesouros { border-left-color: var(--tesouros); }
         .color-ministerio { border-left-color: var(--ministerio); }
         .color-vida-crista { border-left-color: var(--vida-crista); }
@@ -68,24 +75,21 @@
         .timer-row { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
         .timer-display { font-size: 1.8rem; font-weight: 700; cursor: pointer; }
         .controls { display: flex; gap: 8px; }
-        .icon-btn { border: none; width: 38px; height: 38px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; color: white; }
+        .icon-btn { border: none; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; color: white; position: relative; z-index: 10; }
         .btn-play { background: var(--success-color); }
         .btn-pause { background: var(--danger-color); }
         .btn-reset { background: #6c757d; }
 
-        .total-box { margin-top: 15px; padding: 15px; background: rgba(90, 61, 141, 0.05); border-radius: 8px; border: 1px dashed var(--primary-color); text-align: center; }
-        .total-value { font-size: 1.6rem; font-weight: 700; margin-bottom: 8px; }
-        .btn-reset-all { width: 100%; padding: 10px; background: transparent; border: 1px solid var(--danger-color); color: var(--danger-color); border-radius: 8px; font-weight: 700; font-size: 0.75rem; cursor: pointer; text-transform: uppercase; }
-
-        .btn-config-action { width: 28px; height: 28px; position: absolute; display: none; border-radius: 50%; border: none; color: white; cursor: pointer; align-items: center; justify-content: center; z-index: 10; }
-        .btn-delete { background: #333; top: -10px; right: -10px; }
-        .btn-edit { background: var(--primary-color); top: -10px; right: 25px; }
+        .btn-config-action { width: 36px; height: 36px; position: absolute; display: none; border-radius: 50%; border: none; color: white; cursor: pointer; align-items: center; justify-content: center; z-index: 20; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+        .btn-delete { background: #333; top: -12px; right: -12px; }
+        .btn-edit { background: var(--primary-color); top: -12px; right: 30px; }
+        
         .config-mode .btn-config-action { display: flex; }
-        .config-mode .timer-row { opacity: 0.2; pointer-events: none; }
+        .config-mode .timer-row, .config-mode .participant-input { opacity: 0.1; pointer-events: none; }
 
-        .status-bar { position: fixed; bottom: 75px; left: 0; width: 100%; text-align: center; font-size: 10px; color: #888; font-weight: 700; }
-        .status-item { opacity: 0.2; display: inline-flex; align-items: center; gap: 4px; }
-        .status-item.active { opacity: 1; color: var(--success-color); }
+        .total-box { margin-top: 20px; padding: 15px; background: rgba(90, 61, 141, 0.05); border-radius: 8px; border: 1px dashed var(--primary-color); text-align: center; }
+        .total-value { font-size: 1.6rem; font-weight: 700; margin-bottom: 8px; display: block; }
+        .btn-reset-all { width: 100%; padding: 12px; background: transparent; border: 1px solid var(--danger-color); color: var(--danger-color); border-radius: 8px; font-weight: 700; font-size: 0.75rem; cursor: pointer; text-transform: uppercase; }
 
         .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--nav-bg); border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; padding: 10px 0; z-index: 100; }
         .nav-item { background: none; border: none; color: var(--text-color); cursor: pointer; display: flex; flex-direction: column; align-items: center; font-size: 0.75rem; }
@@ -95,6 +99,10 @@
         .modal input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-color); color: var(--text-color); }
         .modal-footer { display: flex; gap: 10px; margin-top: 15px; }
         .modal-btn { flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; }
+
+        .sortable-ghost { opacity: 0.3; background: var(--primary-color) !important; }
+        .alert-danger { background: rgba(220, 53, 69, 0.1); border-color: var(--danger-color); }
+        .alert-warning { background: rgba(255, 193, 7, 0.1); border-color: var(--warning-color); }
     </style>
 </head>
 <body id="body">
@@ -121,26 +129,20 @@
             <div id="acc-vida" class="accordion-content sortable-list" data-container="acc-vida"></div>
         </div>
         <div class="total-box">
-            <div style="font-size: 0.7rem; font-weight:700; color:var(--primary-color)">TOTAL DA REUNIÃO</div>
-            <div class="total-value" id="total-meio">00:00</div>
+            <span style="font-size: 0.7rem; font-weight:700; color:var(--primary-color)">TOTAL DA REUNIÃO</span>
+            <span class="total-value" id="total-meio">00:00</span>
             <button class="btn-reset-all" onclick="confirmResetAll('meio')">Zerar Todos da Aba</button>
         </div>
     </div>
 
     <div id="fim" class="content">
-        <div id="list-fim" class="sortable-list" data-container="list-fim"></div>
+        <div id="list-fim" class="sortable-list" data-container="list-fim" style="min-height: 50px;"></div>
         <div class="total-box">
-            <div style="font-size: 0.7rem; font-weight:700; color:var(--primary-color)">TOTAL DA REUNIÃO</div>
-            <div class="total-value" id="total-fim">00:00</div>
+            <span style="font-size: 0.7rem; font-weight:700; color:var(--primary-color)">TOTAL DA REUNIÃO</span>
+            <span class="total-value" id="total-fim">00:00</span>
             <button class="btn-reset-all" onclick="confirmResetAll('fim')">Zerar Todos da Aba</button>
         </div>
     </div>
-</div>
-
-<div class="status-bar">
-    <span id="status-wake" class="status-item">
-        <span class="material-icons" style="font-size: 14px">lightbulb</span> TELA SEMPRE ACESA
-    </span>
 </div>
 
 <nav class="bottom-nav">
@@ -178,42 +180,62 @@
         { id: "p10", nome: "Estudo de A Sentinela", meta: 60, container: "list-fim", cor: "color-fim", label: "📢 FIM DE SEMANA" }
     ];
 
+    let meetingParts = JSON.parse(localStorage.getItem('jw_parts_v29')) || defaultParts;
+    let timers = JSON.parse(localStorage.getItem('jw_timers_v29')) || {};
+    let participants = JSON.parse(localStorage.getItem('jw_names_v29')) || {};
+    let history = JSON.parse(localStorage.getItem('jw_history_v29')) || [];
     let currentTab = 'meio';
-    let meetingParts = JSON.parse(localStorage.getItem('jw_parts_v24')) || defaultParts;
-    let timers = JSON.parse(localStorage.getItem('jw_timers_v24')) || {};
-    let participants = JSON.parse(localStorage.getItem('jw_names_v24')) || {};
-    let history = JSON.parse(localStorage.getItem('jw_history_v24')) || [];
-    let wakeLock = null;
-
-    async function requestWakeLock() {
-        if ('wakeLock' in navigator) {
-            try { 
-                wakeLock = await navigator.wakeLock.request('screen');
-                document.getElementById('status-wake').classList.add('active');
-            } catch (err) {}
-        }
-    }
 
     function render() {
-        document.querySelectorAll('.sortable-list').forEach(c => c.innerHTML = "");
+        document.querySelectorAll('.sortable-list').forEach(c => {
+            c.innerHTML = "";
+            new Sortable(c, {
+                animation: 150,
+                ghostClass: 'sortable-ghost',
+                disabled: !document.getElementById('body').classList.contains('config-mode'),
+                filter: 'input, button', // Impede arraste ao clicar em inputs ou botões
+                onEnd: function() {
+                    const newOrder = [];
+                    document.querySelectorAll('.part-card').forEach(card => {
+                        const id = card.id.replace('card-', '');
+                        const part = meetingParts.find(p => p.id === id);
+                        if(part) newOrder.push(part);
+                    });
+                    const missingParts = meetingParts.filter(p => !newOrder.find(no => no.id === p.id));
+                    meetingParts = [...newOrder, ...missingParts];
+                    save();
+                }
+            });
+        });
+
         meetingParts.forEach(p => {
             if (!timers[p.id]) timers[p.id] = { sec: 0, running: false };
             const container = document.querySelector(`[data-container="${p.container}"]`);
             if(!container) return;
             container.innerHTML += `
                 <div class="part-card ${p.cor}" id="card-${p.id}">
-                    <button class="btn-config-action btn-delete" onclick="confirmDelete('${p.id}')"><span class="material-icons" style="font-size:16px">delete</span></button>
-                    <button class="btn-config-action btn-edit" onclick="openEditModal('${p.id}')"><span class="material-icons" style="font-size:16px">edit</span></button>
-                    <div style="font-weight:700; font-size: 0.9rem">${p.nome} <span style="font-size:0.7rem; opacity:0.6">(${p.meta} min)</span></div>
-                    <input type="text" class="participant-input" placeholder="Nome do participante..." 
-                        value="${participants[p.id] || ''}" oninput="saveName('${p.id}', this.value)">
-                    <div class="timer-row">
-                        <div class="timer-display" onclick="openAdjustModal('${p.id}')" id="disp-${p.id}">00:00</div>
-                        <div class="controls">
-                            <button class="icon-btn ${timers[p.id].running ? 'btn-pause' : 'btn-play'}" onclick="toggleTimer('${p.id}')">
-                                <span class="material-icons">${timers[p.id].running ? 'pause' : 'play_arrow'}</span>
-                            </button>
-                            <button class="icon-btn btn-reset" onclick="confirmResetPart('${p.id}')"><span class="material-icons">replay</span></button>
+                    <button class="btn-config-action btn-delete" onclick="confirmDelete('${p.id}')"><span class="material-icons">delete</span></button>
+                    <button class="btn-config-action btn-edit" onclick="openEditModal('${p.id}')"><span class="material-icons">edit</span></button>
+                    
+                    <div class="drag-handle">
+                        <span class="material-icons">drag_indicator</span>
+                        <div style="font-weight:700; font-size: 0.9rem">${p.nome} <span style="font-size:0.7rem; opacity:0.6">(${p.meta} min)</span></div>
+                    </div>
+
+                    <div class="main-content">
+                        <div class="part-info-static" style="font-weight:700; font-size:0.9rem; margin-bottom:5px; ${document.getElementById('body').classList.contains('config-mode') ? 'display:none' : ''}">
+                            ${p.nome} <span style="font-size:0.7rem; opacity:0.6">(${p.meta} min)</span>
+                        </div>
+                        <input type="text" class="participant-input" placeholder="Participante..." 
+                            value="${participants[p.id] || ''}" oninput="saveName('${p.id}', this.value)">
+                        <div class="timer-row">
+                            <div class="timer-display" onclick="openAdjustModal('${p.id}')" id="disp-${p.id}">00:00</div>
+                            <div class="controls">
+                                <button class="icon-btn ${timers[p.id].running ? 'btn-pause' : 'btn-play'}" onclick="toggleTimer('${p.id}')">
+                                    <span class="material-icons">${timers[p.id].running ? 'pause' : 'play_arrow'}</span>
+                                </button>
+                                <button class="icon-btn btn-reset" onclick="confirmResetPart('${p.id}')"><span class="material-icons">replay</span></button>
+                            </div>
                         </div>
                     </div>
                 </div>`;
@@ -222,25 +244,15 @@
         updateTotals();
     }
 
-    function openModal(title, body, confirmFn, showCancel = true) {
-        document.getElementById('modalTitle').innerText = title;
-        document.getElementById('modalBody').innerHTML = body;
-        document.getElementById('modalCancelBtn').style.display = showCancel ? 'block' : 'none';
-        document.getElementById('modalConfirmBtn').onclick = () => { confirmFn(); closeModal(); };
-        document.getElementById('customModal').style.display = 'flex';
-    }
-    function closeModal() { document.getElementById('customModal').style.display = 'none'; }
-
     function toggleTimer(id) {
         const state = !timers[id].running;
         Object.keys(timers).forEach(k => timers[k].running = false);
         timers[id].running = state;
-        if(state) requestWakeLock();
         save(); render();
     }
 
-    function saveName(id, val) { participants[id] = val; localStorage.setItem('jw_names_v24', JSON.stringify(participants)); }
-    function save() { localStorage.setItem('jw_timers_v24', JSON.stringify(timers)); localStorage.setItem('jw_parts_v24', JSON.stringify(meetingParts)); }
+    function saveName(id, val) { participants[id] = val; localStorage.setItem('jw_names_v29', JSON.stringify(participants)); }
+    function save() { localStorage.setItem('jw_timers_v29', JSON.stringify(timers)); localStorage.setItem('jw_parts_v29', JSON.stringify(meetingParts)); }
 
     function updateDisplay(id) {
         const p = meetingParts.find(x => x.id === id);
@@ -262,9 +274,10 @@
             const s = timers[p.id].sec;
             if(p.container === 'list-fim') sF += s; else sM += s;
         });
-        document.getElementById('total-meio').innerText = formatTime(sM);
-        document.getElementById('total-fim').innerText = formatTime(sF);
+        if(document.getElementById('total-meio')) document.getElementById('total-meio').innerText = formatTime(sM);
+        if(document.getElementById('total-fim')) document.getElementById('total-fim').innerText = formatTime(sF);
     }
+    
     function formatTime(s) { return `${Math.floor(s/60).toString().padStart(2,'0')}:${(s%60).toString().padStart(2,'0')}`; }
 
     function toggleAcc(id, el) {
@@ -283,37 +296,40 @@
 
     function toggleConfig() { 
         const body = document.getElementById('body');
-        const icon = document.getElementById('config-icon');
-        const label = document.getElementById('config-label');
         body.classList.toggle('config-mode'); 
-        if(body.classList.contains('config-mode')) {
-            icon.innerText = 'check_circle'; icon.style.color = 'var(--success-color)';
-            label.innerText = 'Confirmar'; label.style.color = 'var(--success-color)';
-        } else {
-            icon.innerText = 'settings'; icon.style.color = '';
-            label.innerText = 'Configurar'; label.style.color = '';
-        }
+        const isConfig = body.classList.contains('config-mode');
+        document.getElementById('config-icon').innerText = isConfig ? 'check_circle' : 'settings';
+        document.getElementById('config-label').innerText = isConfig ? 'Pronto' : 'Configurar';
+        render(); // Re-render para ativar/desativar o Sortable
     }
 
-    function confirmDelete(id) { openModal("Remover?", "Excluir esta parte definitivamente?", () => { meetingParts = meetingParts.filter(p => p.id !== id); save(); render(); }); }
+    function confirmDelete(id) { openModal("Remover?", "Excluir esta parte?", () => { meetingParts = meetingParts.filter(p => p.id !== id); save(); render(); }); }
     function openEditModal(id) {
         const p = meetingParts.find(x => x.id === id);
-        const body = `Nome: <input type="text" id="editN" value="${p.nome}"> Meta: <input type="number" id="editM" value="${p.meta}">`;
-        openModal("Editar Parte", body, () => {
+        openModal("Editar Parte", `Nome: <input type="text" id="editN" value="${p.nome}"> Meta: <input type="number" id="editM" value="${p.meta}">`, () => {
             p.nome = document.getElementById('editN').value;
             p.meta = parseInt(document.getElementById('editM').value);
             save(); render();
         });
     }
-    function confirmResetPart(id) { openModal("Zerar?", "Reiniciar tempo desta parte?", () => { timers[id].sec = 0; timers[id].running = false; save(); render(); }); }
-    function confirmResetAll(aba) { openModal("Zerar Tudo?", "Zerar todos os cronômetros desta aba?", () => { meetingParts.forEach(p => { if((aba==='fim' && p.container==='list-fim') || (aba==='meio' && p.container!=='list-fim')) { timers[p.id].sec=0; timers[p.id].running=false; } }); save(); render(); }); }
-    function openAdjustModal(id) { openModal("Ajuste Manual", `Minutos passados: <input type="number" id="adjM">`, () => { timers[id].sec = (parseInt(document.getElementById('adjM').value) || 0) * 60; save(); render(); }); }
+
+    function confirmResetPart(id) { openModal("Zerar?", "Reiniciar cronômetro?", () => { timers[id].sec = 0; timers[id].running = false; save(); render(); }); }
+    function confirmResetAll(aba) { openModal("Zerar Aba?", "Zerar todos os tempos desta aba?", () => { meetingParts.forEach(p => { if((aba==='fim' && p.container==='list-fim') || (aba==='meio' && p.container!=='list-fim')) { timers[p.id].sec=0; timers[p.id].running=false; } }); save(); render(); }); }
+    function openAdjustModal(id) { openModal("Ajustar", `Minutos: <input type="number" id="adjM">`, () => { timers[id].sec = (parseInt(document.getElementById('adjM').value) || 0) * 60; save(); render(); }); }
+
+    function openModal(title, body, confirmFn, showCancel = true) {
+        document.getElementById('modalTitle').innerText = title;
+        document.getElementById('modalBody').innerHTML = body;
+        document.getElementById('modalCancelBtn').style.display = showCancel ? 'block' : 'none';
+        document.getElementById('modalConfirmBtn').onclick = () => { confirmFn(); closeModal(); };
+        document.getElementById('customModal').style.display = 'flex';
+    }
+    function closeModal() { document.getElementById('customModal').style.display = 'none'; }
 
     function openHistory() {
-        let body = history.length ? "" : "<p style='text-align:center'>Histórico vazio.</p>";
+        let body = history.length ? "" : "<p>Vazio.</p>";
         history.slice().reverse().forEach(h => { body += `<div style="border-bottom:1px solid #ddd; padding:8px; font-size:0.8rem"><strong>${h.data}</strong><br>${h.resumo}</div>`; });
-        body += `<button onclick="history=[]; localStorage.setItem('jw_history_v24', '[]'); closeModal()" class="modal-btn" style="width:100%; margin-top:10px; background:#333; color:white">Limpar Tudo</button>`;
-        openModal("Histórico Recente", `<div style="max-height:250px; overflow-y:auto">${body}</div>`, () => {});
+        openModal("Histórico", `<div style="max-height:250px; overflow-y:auto">${body}</div>`, () => {});
     }
 
     function toggleTheme() {
@@ -340,32 +356,21 @@
         let lastLabel = "";
         let hasData = false;
         let resumoHist = "";
-
         meetingParts.forEach(p => {
-            // Verifica se a parte pertence à aba atual e se tem tempo
-            const isCorrectAba = (currentTab === 'fim' && p.container === 'list-fim') || (currentTab === 'meio' && p.container !== 'list-fim');
-            
-            if(isCorrectAba && timers[p.id].sec > 0) {
-                hasData = true;
-                if(p.label !== lastLabel) {
-                    txt += `\n*${p.label}*\n`;
-                    lastLabel = p.label;
+            if((currentTab === 'fim' && p.container === 'list-fim') || (currentTab === 'meio' && p.container !== 'list-fim')) {
+                if(timers[p.id].sec > 0) {
+                    hasData = true;
+                    if(p.label !== lastLabel) { txt += `\n*${p.label}*\n`; lastLabel = p.label; }
+                    const time = formatTime(timers[p.id].sec);
+                    txt += `• ${p.nome}${participants[p.id] ? " ("+participants[p.id]+")" : ""}: ${time}\n`;
+                    resumoHist += `${p.nome}: ${time} | `;
                 }
-                const time = formatTime(timers[p.id].sec);
-                const name = participants[p.id] ? ` (${participants[p.id]})` : "";
-                txt += `• ${p.nome}${name}: ${time}\n`;
-                resumoHist += `${p.nome}: ${time} | `;
             }
         });
-
-        if(!hasData) {
-            openModal("Aviso", `Não há tempos registrados na aba ${meetingName} para compartilhar.`, () => {}, false);
-            return;
-        }
-
+        if(!hasData) { openModal("Aviso", "Não há tempos registrados.", () => {}, false); return; }
         const agora = new Date();
         history.push({ data: agora.toLocaleDateString() + " " + agora.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}), resumo: resumoHist });
-        localStorage.setItem('jw_history_v24', JSON.stringify(history));
+        localStorage.setItem('jw_history_v29', JSON.stringify(history));
         window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(txt));
     }
 
