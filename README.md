@@ -1,6 +1,32 @@
-# ⏱️ Timer para Reuniões (Web App)
+# ⏱️ Meeting Timer
 
-Um cronômetro progressivo e intuitivo desenvolvido para gestão de tempo em reuniões, com foco em usabilidade mobile e feedback visual em tempo real.
+Um cronômetro profissional e intuitivo desenvolvido para a gestão de tempo em reuniões, com suporte a múltiplas abas, alertas visuais (semáforo) e compartilhamento de relatórios.
+
+---
+
+## 📥 Download do Aplicativo (Android)
+
+Para sua comodidade, você pode instalar o **Meeting Timer** diretamente no seu celular Android. Clique no botão abaixo para baixar a versão mais recente:
+
+[![Baixar APK](https://img.shields.io/badge/Download-APK_Instalador-success?style=for-the-badge&logo=android)](https://github.com/felipesenajw/meeting-timer-web/releases/download/v1.0.0/app-release.apk)
+
+> **💡 Dica de Instalação:** Como o app é distribuído fora da Play Store, ao abrir o arquivo, o Android pode solicitar permissão para "Instalar de Fontes Desconhecidas". Basta autorizar para concluir a instalação.
+
+---
+
+## 🚀 Principais Funcionalidades
+
+* **Dual Mode:** Abas separadas para reuniões de *Meio de Semana* e *Fim de Semana*.
+* **Alerta Visual (Semáforo):**
+    * 🟢 **Verde:** Tempo em execução.
+    * 🟡 **Amarelo:** Alerta de 1 minuto restante.
+    * 🔴 **Vermelho Pulsante:** Meta de tempo ultrapassada.
+* **Relatórios Automáticos:** Gere um resumo detalhado e envie para o WhatsApp com um clique.
+* **Customização Total:** Edite nomes, tempos e organize a ordem das partes arrastando os cards.
+* **Modo Escuro:** Interface adaptável para ambientes com pouca luz.
+
+## 🛠️ Como usar a versão Web
+Se preferir não instalar o app, você pode abrir o arquivo `index.html` diretamente em qualquer navegador moderno (Chrome, Safari ou Edge).
 
 [ ![Acesse o App](https://img.shields.io/badge/Acesse%20o%20App-Clique%20Aqui-5a3d8d?style=for-the-badge) ](https://felipesenajw.github.io/meeting-timer-web/)
 
@@ -26,7 +52,7 @@ Este projeto foi desenhado como um **Web App**.
 ## 🚀 Últimas Atualizações
 
 <details>
-<summary><b>Clique para conferir as novidades da Versão Atual – 2.1.1</b></summary>
+<summary><b>Clique para conferir as novidades da Versão Atual – 0.1.1</b></summary>
 
 ### 💡 Experiência de Uso (UX/UI)
 * **Barra de Navegação Unificada:** O botão **Compartilhar** agora reside na barra inferior, centralizando as ações e liberando mais espaço para os cronômetros.
