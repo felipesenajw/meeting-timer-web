@@ -50,7 +50,6 @@
         .tab { flex: 1; padding: 12px; text-align: center; cursor: pointer; border-radius: 8px; font-weight: 500; font-size: 0.85rem; border: none; color: var(--text-color); background: transparent; transition: 0.2s; }
         .tab.active { background: var(--primary-color); color: #ffffff !important; }
 
-        /* Efeito de Transição Suave */
         .content { display: none; opacity: 0; transform: translateY(10px); transition: opacity 0.3s ease, transform 0.3s ease; }
         .content.active { display: block; opacity: 1; transform: translateY(0); }
 
@@ -91,9 +90,15 @@
         .config-mode .btn-config-action { display: flex; }
         .config-mode .main-content { opacity: 0.2; pointer-events: none; }
 
-        /* Ajuste do Tempo Total da Reunião */
-        .total-box { margin-top: 25px; padding: 25px; background: var(--card-bg); border-radius: 18px; border: 1px solid var(--border-color); text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .total-label { font-size: 0.7rem; font-weight: 700; opacity: 0.6; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+        .btn-add-part { 
+            width: 100%; padding: 10px; background: transparent; border: 2px dashed var(--border-color); 
+            color: var(--text-color); border-radius: 12px; font-weight: 600; font-size: 0.75rem; 
+            cursor: pointer; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 8px;
+            opacity: 0.7; transition: 0.2s;
+        }
+
+        .total-box { margin-top: 25px; padding: 25px; background: var(--card-bg); border-radius: 18px; border: 1px solid var(--border-color); text-align: center; display: flex; flex-direction: column; align-items: center; }
+        .total-label { font-size: 0.7rem; font-weight: 700; opacity: 0.6; text-transform: uppercase; margin-bottom: 8px; }
         .total-value { font-size: 2.8rem; font-weight: 700; color: var(--primary-color); letter-spacing: -2px; line-height: 1; }
         
         .btn-reset-all { width: 100%; padding: 12px; background: transparent; border: 1px solid var(--danger-color); color: var(--danger-color); border-radius: 10px; font-weight: 700; cursor: pointer; margin-top: 20px; }
@@ -105,8 +110,8 @@
 
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; padding: 20px; }
         .modal { background: var(--card-bg); color: var(--text-color); padding: 25px; border-radius: 20px; width: 100%; max-width: 350px; border: 1px solid var(--border-color); }
-        .modal input { width: 100%; padding: 12px; margin: 15px 0; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-color); color: var(--text-color); }
-        .modal-footer { display: flex; gap: 10px; margin-top: 10px; }
+        .modal input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-color); color: var(--text-color); }
+        .modal-footer { display: flex; gap: 10px; margin-top: 15px; }
         .modal-btn { flex: 1; padding: 14px; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; }
 
         .alert-danger { background: rgba(220, 53, 69, 0.1) !important; border-color: var(--danger-color); }
@@ -125,15 +130,24 @@
     <div id="meio" class="content active">
         <div class="accordion">
             <div class="accordion-header" style="background-color:var(--tesouros)" onclick="toggleAcc('acc-tesouros', this)">TESOUROS DA PALAVRA <span class="material-icons">expand_more</span></div>
-            <div id="acc-tesouros" class="accordion-content sortable-list" data-container="acc-tesouros"></div>
+            <div id="acc-tesouros-wrap" class="accordion-content">
+                <div id="acc-tesouros" class="sortable-list" data-container="acc-tesouros"></div>
+                <button class="btn-add-part" onclick="prepareAdd('acc-tesouros')"><span class="material-icons">add</span> Adicionar Parte</button>
+            </div>
         </div>
         <div class="accordion">
             <div class="accordion-header" style="background-color:var(--ministerio)" onclick="toggleAcc('acc-ministerio', this)">FAÇA SEU MELHOR <span class="material-icons">expand_more</span></div>
-            <div id="acc-ministerio" class="accordion-content sortable-list" data-container="acc-ministerio"></div>
+            <div id="acc-ministerio-wrap" class="accordion-content">
+                <div id="acc-ministerio" class="sortable-list" data-container="acc-ministerio"></div>
+                <button class="btn-add-part" onclick="prepareAdd('acc-ministerio')"><span class="material-icons">add</span> Adicionar Parte</button>
+            </div>
         </div>
         <div class="accordion">
             <div class="accordion-header" style="background-color:var(--vida-crista)" onclick="toggleAcc('acc-vida', this)">NOSSA VIDA CRISTÃ <span class="material-icons">expand_more</span></div>
-            <div id="acc-vida" class="accordion-content sortable-list" data-container="acc-vida"></div>
+            <div id="acc-vida-wrap" class="accordion-content">
+                <div id="acc-vida" class="sortable-list" data-container="acc-vida"></div>
+                <button class="btn-add-part" onclick="prepareAdd('acc-vida')"><span class="material-icons">add</span> Adicionar Parte</button>
+            </div>
         </div>
         <div class="total-box">
             <span class="total-label">Tempo Total da Reunião</span>
@@ -145,6 +159,7 @@
 
     <div id="fim" class="content">
         <div id="list-fim" class="sortable-list" data-container="list-fim"></div>
+        <button class="btn-add-part" onclick="prepareAdd('list-fim')"><span class="material-icons">add</span> Adicionar Parte</button>
         <div class="total-box">
             <span class="total-label">Tempo Total da Reunião</span>
             <span class="total-value" id="total-fim">00:00</span>
@@ -156,7 +171,7 @@
 
 <nav class="bottom-nav">
     <button class="nav-item" onclick="openHistory()"><span class="material-icons">history</span>Histórico</button>
-    <button class="nav-item" onclick="toggleTheme()"><span class="material-icons">brightness_6</span>Tema</button>
+    <button class="nav-item" onclick="toggleTheme()"><span class="material-icons" id="theme-icon">brightness_6</span>Tema</button>
     <button class="nav-item" onclick="toggleConfig()" id="btn-config-nav">
         <span class="material-icons" id="config-icon">tune</span>
         <span id="config-label">Ajustar</span>
@@ -176,23 +191,38 @@
 </div>
 
 <script>
+    // Inicialização do Tema Inteligente
+    function initTheme() {
+        const savedTheme = localStorage.getItem('jw_user_theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        if (savedTheme) {
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        } else if (systemPrefersDark) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        } else {
+            document.documentElement.setAttribute('data-theme', 'light');
+        }
+    }
+    initTheme();
+
     const defaultParts = [
-        { id: "p1", nome: "Tesouros da Palavra", meta: 10, container: "acc-tesouros", cor: "color-tesouros", label: "💎 TESOUROS" },
-        { id: "p2", nome: "Joias Espirituais", meta: 10, container: "acc-tesouros", cor: "color-tesouros", label: "💎 TESOUROS" },
-        { id: "p3", nome: "Leitura da Bíblia", meta: 4, container: "acc-tesouros", cor: "color-tesouros", label: "💎 TESOUROS" },
-        { id: "p4", nome: "Parte 1", meta: 5, container: "acc-ministerio", cor: "color-ministerio", label: "🎤 MINISTÉRIO" },
-        { id: "p5", nome: "Parte 2", meta: 5, container: "acc-ministerio", cor: "color-ministerio", label: "🎤 MINISTÉRIO" },
-        { id: "p6", nome: "Parte 3", meta: 5, container: "acc-ministerio", cor: "color-ministerio", label: "🎤 MINISTÉRIO" },
-        { id: "p7", nome: "Parte 1", meta: 15, container: "acc-vida", cor: "color-vida-crista", label: "🌳 VIDA CRISTÃ" },
-        { id: "p8", nome: "Estudo Bíblico", meta: 30, container: "acc-vida", cor: "color-vida-crista", label: "🌳 VIDA CRISTÃ" },
-        { id: "p9", nome: "Discurso Público", meta: 30, container: "list-fim", cor: "color-fim", label: "📢 FIM DE SEMANA" },
-        { id: "p10", nome: "Estudo de A Sentinela", meta: 60, container: "list-fim", cor: "color-fim", label: "📢 FIM DE SEMANA" }
+        { id: "p1", nome: "Tesouros da Palavra", meta: 10, container: "acc-tesouros", cor: "color-tesouros" },
+        { id: "p2", nome: "Joias Espirituais", meta: 10, container: "acc-tesouros", cor: "color-tesouros" },
+        { id: "p3", nome: "Leitura da Bíblia", meta: 4, container: "acc-tesouros", cor: "color-tesouros" },
+        { id: "p4", nome: "Parte 1", meta: 5, container: "acc-ministerio", cor: "color-ministerio" },
+        { id: "p5", nome: "Parte 2", meta: 5, container: "acc-ministerio", cor: "color-ministerio" },
+        { id: "p6", nome: "Parte 3", meta: 5, container: "acc-ministerio", cor: "color-ministerio" },
+        { id: "p7", nome: "Parte 1", meta: 15, container: "acc-vida", cor: "color-vida-crista" },
+        { id: "p8", nome: "Estudo Bíblico", meta: 30, container: "acc-vida", cor: "color-vida-crista" },
+        { id: "p9", nome: "Discurso Público", meta: 30, container: "list-fim", cor: "color-fim" },
+        { id: "p10", nome: "Estudo de A Sentinela", meta: 60, container: "list-fim", cor: "color-fim" }
     ];
 
-    let meetingParts = JSON.parse(localStorage.getItem('jw_parts_v37')) || [...defaultParts];
-    let timers = JSON.parse(localStorage.getItem('jw_timers_v37')) || {};
-    let participants = JSON.parse(localStorage.getItem('jw_names_v37')) || {};
-    let history = JSON.parse(localStorage.getItem('jw_history_v37')) || [];
+    let meetingParts = JSON.parse(localStorage.getItem('jw_parts_v39')) || [...defaultParts];
+    let timers = JSON.parse(localStorage.getItem('jw_timers_v39')) || {};
+    let participants = JSON.parse(localStorage.getItem('jw_names_v39')) || {};
+    let history = JSON.parse(localStorage.getItem('jw_history_v39')) || [];
     let currentTab = 'meio';
 
     function render() {
@@ -216,7 +246,7 @@
 
         meetingParts.forEach(p => {
             if (!timers[p.id]) timers[p.id] = { sec: 0, running: false };
-            const container = document.querySelector(`[data-container="${p.container}"]`);
+            const container = document.getElementById(p.container);
             if(!container) return;
             const isRunning = timers[p.id].running;
             container.innerHTML += `
@@ -243,6 +273,31 @@
         updateTotals();
     }
 
+    function toggleTheme() {
+        const current = document.documentElement.getAttribute('data-theme');
+        const next = current === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('jw_user_theme', next);
+    }
+
+    function prepareAdd(containerId) {
+        let cor = "color-fim";
+        if(containerId === 'acc-tesouros') cor = "color-tesouros";
+        if(containerId === 'acc-ministerio') cor = "color-ministerio";
+        if(containerId === 'acc-vida') cor = "color-vida-crista";
+
+        openModal("Nova Parte", `
+            Título: <input type="text" id="newN" placeholder="Ex: Necessidades Locais">
+            Meta (min): <input type="number" id="newM" placeholder="Ex: 15">
+        `, () => {
+            const id = "p_" + Date.now();
+            const nome = document.getElementById('newN').value || "Nova Parte";
+            const meta = parseInt(document.getElementById('newM').value) || 5;
+            meetingParts.push({ id, nome, meta, container: containerId, cor });
+            save(); render();
+        });
+    }
+
     function toggleTimer(id) {
         const state = !timers[id].running;
         if(state) Object.keys(timers).forEach(k => timers[k].running = false);
@@ -250,8 +305,8 @@
         save(); render();
     }
 
-    function saveName(id, val) { participants[id] = val; localStorage.setItem('jw_names_v37', JSON.stringify(participants)); }
-    function save() { localStorage.setItem('jw_timers_v37', JSON.stringify(timers)); localStorage.setItem('jw_parts_v37', JSON.stringify(meetingParts)); }
+    function saveName(id, val) { participants[id] = val; localStorage.setItem('jw_names_v39', JSON.stringify(participants)); }
+    function save() { localStorage.setItem('jw_timers_v39', JSON.stringify(timers)); localStorage.setItem('jw_parts_v39', JSON.stringify(meetingParts)); }
 
     function updateDisplay(id) {
         const p = meetingParts.find(x => x.id === id);
@@ -278,7 +333,7 @@
     function formatTime(s) { return `${Math.floor(s/60).toString().padStart(2,'0')}:${(s%60).toString().padStart(2,'0')}`; }
 
     function toggleAcc(id, el) {
-        const content = document.getElementById(id);
+        const content = document.getElementById(id + '-wrap');
         const icon = el.querySelector('.material-icons');
         content.classList.toggle('open');
         icon.innerText = content.classList.contains('open') ? 'expand_less' : 'expand_more';
@@ -286,24 +341,14 @@
 
     function switchTab(t) {
         currentTab = t;
-        const tabs = ['meio', 'fim'];
-        tabs.forEach(tab => {
-            const el = document.getElementById(tab);
-            const btn = document.getElementById(`tab-btn-${tab}`);
-            if(tab === t) {
-                el.classList.add('active');
-                btn.classList.add('active');
-            } else {
-                el.classList.remove('active');
-                btn.classList.remove('active');
-            }
-        });
+        document.querySelectorAll('.content, .tab').forEach(e => e.classList.remove('active'));
+        document.getElementById(t).classList.add('active');
+        document.getElementById(`tab-btn-${t}`).classList.add('active');
     }
 
     function toggleConfig() { 
-        const body = document.getElementById('body');
-        body.classList.toggle('config-mode'); 
-        const isConfig = body.classList.contains('config-mode');
+        document.getElementById('body').classList.toggle('config-mode'); 
+        const isConfig = document.getElementById('body').classList.contains('config-mode');
         document.getElementById('config-icon').innerText = isConfig ? 'check_circle' : 'tune';
         document.getElementById('config-label').innerText = isConfig ? 'Confirmar' : 'Ajustar';
         document.getElementById('btn-config-nav').classList.toggle('active-mode', isConfig);
@@ -351,10 +396,6 @@
         openModal("Histórico Recente", `<div style="max-height:200px; overflow-y:auto">${body}</div>`, () => {}, false);
     }
 
-    function toggleTheme() {
-        document.documentElement.setAttribute('data-theme', document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
-    }
-
     setInterval(() => {
         Object.keys(timers).forEach(id => {
             if(timers[id].running) {
@@ -381,10 +422,10 @@
                 }
             }
         });
-        if(!hasData) { openModal("Aviso", "Nenhum tempo registrado nesta aba para enviar.", () => {}, false); return; }
+        if(!hasData) { openModal("Aviso", "Nenhum tempo registrado para enviar.", () => {}, false); return; }
         const agora = new Date();
         history.push({ data: agora.toLocaleString(), resumo: resumo });
-        localStorage.setItem('jw_history_v37', JSON.stringify(history));
+        localStorage.setItem('jw_history_v39', JSON.stringify(history));
         window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(txt));
     }
 
