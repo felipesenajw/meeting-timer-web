@@ -62,7 +62,7 @@
 
         .part-card { 
             background: var(--card-bg); border: 1px solid var(--border-color); padding: 18px; border-radius: 18px; margin-bottom: 12px; 
-            border-left: 8px solid #ccc; position: relative; overflow: hidden; transition: transform 0.2s;
+            border-left: 8px solid #ccc; position: relative; overflow: hidden;
         }
         .color-tesouros { border-left-color: var(--tesouros); }
         .color-ministerio { border-left-color: var(--ministerio); }
@@ -76,8 +76,9 @@
         .running .status-dot { display: inline-block; animation: blink 1s infinite; }
         @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
 
-        .participant-input { width: 100%; border: 1px solid transparent; border-radius: 10px; background: rgba(0,0,0,0.04); color: var(--text-color); font-size: 0.95rem; margin-top: 8px; padding: 10px 12px; outline: none; }
-        [data-theme="dark"] .participant-input { background: rgba(255,255,255,0.05); }
+        .participant-input, .modal input { width: 100%; border: 1px solid transparent; border-radius: 12px; background: rgba(0,0,0,0.04); color: var(--text-color); font-size: 0.95rem; padding: 12px; outline: none; margin-top: 8px; }
+        [data-theme="dark"] .participant-input, [data-theme="dark"] .modal input { background: rgba(255,255,255,0.05); }
+        .modal label { font-size: 0.75rem; font-weight: 700; opacity: 0.6; display: block; margin-top: 15px; text-transform: uppercase; }
 
         .timer-row { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; }
         .timer-display { font-size: 2.2rem; font-weight: 700; letter-spacing: -1px; cursor: pointer; }
@@ -106,7 +107,7 @@
 
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); z-index: 9999; justify-content: center; align-items: center; padding: 20px; }
         .modal { background: var(--card-bg); color: var(--text-color); padding: 25px; border-radius: 24px; width: 100%; max-width: 360px; border: 1px solid var(--border-color); }
-        .modal-footer { display: flex; gap: 10px; margin-top: 20px; }
+        .modal-footer { display: flex; gap: 10px; margin-top: 25px; }
         .modal-btn { flex: 1; padding: 14px; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; }
     </style>
 </head>
@@ -144,7 +145,7 @@
         </div>
         
         <div class="total-box">
-            <div style="font-size:0.7rem; font-weight:700; opacity:0.6; margin-bottom:5px">TEMPO TOTAL REUNIÃO</div>
+            <div style="font-size:0.7rem; font-weight:700; opacity:0.6; margin-bottom:5px">TEMPO TOTAL DA REUNIÃO</div>
             <span id="total-meio" style="font-size:3.5rem; font-weight:800; color:var(--primary-color)">00:00</span>
         </div>
         <div class="action-area">
@@ -158,7 +159,7 @@
         <button class="btn-add-part" onclick="prepareAdd('list-fim')"><span class="material-icons">add_circle</span> Nova Parte</button>
         
         <div class="total-box">
-            <div style="font-size:0.7rem; font-weight:700; opacity:0.6; margin-bottom:5px">TEMPO TOTAL</div>
+            <div style="font-size:0.7rem; font-weight:700; opacity:0.6; margin-bottom:5px">TEMPO TOTAL DA REUNIÃO</div>
             <span id="total-fim" style="font-size:3.5rem; font-weight:800; color:var(--primary-color)">00:00</span>
         </div>
         <div class="action-area">
@@ -207,10 +208,10 @@
         { id: "p10", nome: "Estudo de A Sentinela", meta: 60, container: "list-fim", cor: "color-fim" }
     ];
 
-    let meetingParts = JSON.parse(localStorage.getItem('jw_parts_v47')) || [...defaultParts];
-    let timers = JSON.parse(localStorage.getItem('jw_timers_v47')) || {};
-    let participants = JSON.parse(localStorage.getItem('jw_names_v47')) || {};
-    let history = JSON.parse(localStorage.getItem('jw_history_v47')) || [];
+    let meetingParts = JSON.parse(localStorage.getItem('jw_parts_v48')) || [...defaultParts];
+    let timers = JSON.parse(localStorage.getItem('jw_timers_v48')) || {};
+    let participants = JSON.parse(localStorage.getItem('jw_names_v48')) || {};
+    let history = JSON.parse(localStorage.getItem('jw_history_v48')) || [];
     let currentTab = 'meio';
 
     function render() {
@@ -301,8 +302,8 @@
     }
     function closeModal() { document.getElementById('customModal').style.display = 'none'; }
 
-    function saveName(id, val) { participants[id] = val; localStorage.setItem('jw_names_v47', JSON.stringify(participants)); }
-    function save() { localStorage.setItem('jw_timers_v47', JSON.stringify(timers)); localStorage.setItem('jw_parts_v47', JSON.stringify(meetingParts)); }
+    function saveName(id, val) { participants[id] = val; localStorage.setItem('jw_names_v48', JSON.stringify(participants)); }
+    function save() { localStorage.setItem('jw_timers_v48', JSON.stringify(timers)); localStorage.setItem('jw_parts_v48', JSON.stringify(meetingParts)); }
 
     function updateDisplay(id) {
         const p = meetingParts.find(x => x.id === id);
@@ -338,14 +339,14 @@
     }
 
     function openAdjustModal(id) {
-        openModal("Ajustar Tempo", `Minutos: <input type="number" id="adjM" placeholder="Ex: 5">`, () => {
+        openModal("Ajustar Tempo", `<label>Minutos Totais</label><input type="number" id="adjM" placeholder="Ex: 5">`, () => {
             const val = parseInt(document.getElementById('adjM').value);
             if(!isNaN(val)) { timers[id].sec = val * 60; save(); render(); }
         });
     }
 
     function prepareAdd(containerId) {
-        openModal("Nova Parte", `Título: <input type="text" id="newN"> Meta (min): <input type="number" id="newM">`, () => {
+        openModal("Nova Parte", `<label>Título da Parte</label><input type="text" id="newN"><label>Meta de Tempo (min)</label><input type="number" id="newM">`, () => {
             const id = "p_" + Date.now();
             let cor = containerId.includes('tesouros') ? 'color-tesouros' : (containerId.includes('ministerio') ? 'color-ministerio' : (containerId.includes('vida') ? 'color-vida-crista' : 'color-fim'));
             meetingParts.push({ id, nome: document.getElementById('newN').value || "Nova Parte", meta: parseInt(document.getElementById('newM').value) || 5, container: containerId, cor });
@@ -355,7 +356,7 @@
 
     function openEditModal(id) {
         const p = meetingParts.find(x => x.id === id);
-        openModal("Editar Parte", `Nome: <input type="text" id="editN" value="${p.nome}"> Meta: <input type="number" id="editM" value="${p.meta}">`, () => {
+        openModal("Editar Parte", `<label>Nome da Parte</label><input type="text" id="editN" value="${p.nome}"><label>Meta (minutos)</label><input type="number" id="editM" value="${p.meta}">`, () => {
             p.nome = document.getElementById('editN').value;
             p.meta = parseInt(document.getElementById('editM').value);
             save(); render();
@@ -365,7 +366,7 @@
     function confirmDelete(id) { openModal("Remover?", "Excluir esta parte permanentemente?", () => { meetingParts = meetingParts.filter(p => p.id !== id); save(); render(); }); }
     function confirmResetPart(id) { openModal("Zerar?", "Reiniciar tempo desta parte?", () => { timers[id].sec = 0; timers[id].running = false; save(); render(); }); }
     function confirmResetAll(aba) { openModal("Zerar Tudo?", "Reiniciar todos os tempos desta aba?", () => { meetingParts.forEach(p => { if((aba==='fim' && p.container==='list-fim') || (aba==='meio' && p.container!=='list-fim')) { timers[p.id].sec=0; timers[p.id].running=false; } }); save(); render(); }); }
-    function confirmClearNames(aba) { openModal("Limpar Dados?", "Apagar todos os nomes e temas desta aba?", () => { meetingParts.forEach(p => { if((aba==='fim' && p.container==='list-fim') || (aba==='meio' && p.container!=='list-fim')) delete participants[p.id]; }); localStorage.setItem('jw_names_v47', JSON.stringify(participants)); render(); }); }
+    function confirmClearNames(aba) { openModal("Limpar Dados?", "Apagar todos os nomes e temas desta aba?", () => { meetingParts.forEach(p => { if((aba==='fim' && p.container==='list-fim') || (aba==='meio' && p.container!=='list-fim')) delete participants[p.id]; }); localStorage.setItem('jw_names_v48', JSON.stringify(participants)); render(); }); }
 
     function openHistory() {
         let body = history.length ? "" : "<p style='text-align:center; opacity:0.5'>Sem registros.</p>";
@@ -374,24 +375,42 @@
     }
 
     function sendWhatsApp() {
-        let txt = `*⏱️ RELATÓRIO DE TEMPO*\n\n`;
+        let txt = `*⏱️ TEMPO DAS PARTES*\n\n`;
         let resumo = "";
-        let temTempo = false;
-        meetingParts.forEach(p => {
-            if((currentTab === 'fim' && p.container === 'list-fim') || (currentTab === 'meio' && p.container !== 'list-fim')) {
-                if(timers[p.id].sec > 0) {
-                    txt += `• ${p.nome}: ${formatTime(timers[p.id].sec)}\n`;
+        
+        const categories = [
+            { id: 'acc-tesouros', label: 'TESOUROS' },
+            { id: 'acc-ministerio', label: 'MINISTÉRIO' },
+            { id: 'acc-vida', label: 'VIDA CRISTÃ' },
+            { id: 'list-fim', label: 'REUNIÃO FDS' }
+        ];
+
+        let temRegistro = false;
+
+        categories.forEach(cat => {
+            const partsInCat = meetingParts.filter(p => p.container.startsWith(cat.id));
+            let catTxt = "";
+            
+            partsInCat.forEach(p => {
+                if (timers[p.id].sec > 0) {
+                    catTxt += `• ${p.nome}: *${formatTime(timers[p.id].sec)}*\n`;
                     resumo += `${p.nome}: ${formatTime(timers[p.id].sec)} | `;
-                    temTempo = true;
+                    temRegistro = true;
                 }
+            });
+
+            if (catTxt) {
+                txt += `--- ${cat.label} ---\n${catTxt}\n`;
             }
         });
-        if(!temTempo) {
+
+        if(!temRegistro) {
             openModal("Aviso", "Inicie algum cronômetro primeiro para poder enviar o relatório!", null, false);
             return;
         }
+
         history.push({ data: new Date().toLocaleString(), resumo });
-        localStorage.setItem('jw_history_v47', JSON.stringify(history));
+        localStorage.setItem('jw_history_v48', JSON.stringify(history));
         window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(txt));
     }
 
