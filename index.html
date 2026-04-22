@@ -22,6 +22,7 @@
             --ministerio: #b38f00;
             --vida-crista: #9e2a2b;
             --danger-color: #dc3545;
+            --warning-color: #ffc107;
             --success-color: #28a745;
             --bg-color: #f0f2f5;
             --card-bg: rgba(255, 255, 255, 0.9);
@@ -55,21 +56,34 @@
         .content { display: none; }
         .content.active { display: block; }
 
+        /* Accordion */
         .accordion { margin-bottom: 15px; border-radius: 20px; overflow: hidden; border: 1px solid var(--border-color); background: var(--card-bg); }
         .accordion-header { padding: 16px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; color: white; font-weight: 700; font-size: 0.85rem; }
         .accordion-content { display: none; padding: 12px; }
         .accordion-content.open { display: block; }
 
+        /* Card Visuals & Semaphores */
         .part-card { 
             background: var(--card-bg); border: 1px solid var(--border-color); padding: 18px; border-radius: 18px; margin-bottom: 12px; 
-            border-left: 8px solid #ccc; position: relative; overflow: hidden;
+            border-left: 8px solid #ccc; position: relative; overflow: hidden; transition: background 0.5s, border-color 0.5s;
         }
         .color-tesouros { border-left-color: var(--tesouros); }
         .color-ministerio { border-left-color: var(--ministerio); }
         .color-vida-crista { border-left-color: var(--vida-crista); }
         .color-fim { border-left-color: var(--primary-color); }
 
+        /* Estados do Semáforo */
+        .card-warning { background: rgba(255, 193, 7, 0.15) !important; border-color: var(--warning-color) !important; }
+        .card-danger { background: rgba(220, 53, 69, 0.15) !important; border-color: var(--danger-color) !important; animation: pulse-danger 1.5s infinite; }
+
+        @keyframes pulse-danger {
+            0% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(220, 53, 69, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
+        }
+
         .progress-bar { position: absolute; top: 0; left: 0; height: 4px; background: var(--success-color); width: 0%; transition: width 1s linear; }
+        .progress-warning { background: var(--warning-color); }
         .progress-over { background: var(--danger-color); }
 
         .status-dot { width: 8px; height: 8px; background: var(--success-color); border-radius: 50%; display: none; margin-left: 8px; }
@@ -208,10 +222,10 @@
         { id: "p10", nome: "Estudo de A Sentinela", meta: 60, container: "list-fim", cor: "color-fim" }
     ];
 
-    let meetingParts = JSON.parse(localStorage.getItem('jw_parts_v48')) || [...defaultParts];
-    let timers = JSON.parse(localStorage.getItem('jw_timers_v48')) || {};
-    let participants = JSON.parse(localStorage.getItem('jw_names_v48')) || {};
-    let history = JSON.parse(localStorage.getItem('jw_history_v48')) || [];
+    let meetingParts = JSON.parse(localStorage.getItem('jw_parts_v49')) || [...defaultParts];
+    let timers = JSON.parse(localStorage.getItem('jw_timers_v49')) || {};
+    let participants = JSON.parse(localStorage.getItem('jw_names_v49')) || {};
+    let history = JSON.parse(localStorage.getItem('jw_history_v49')) || [];
     let currentTab = 'meio';
 
     function render() {
@@ -302,20 +316,36 @@
     }
     function closeModal() { document.getElementById('customModal').style.display = 'none'; }
 
-    function saveName(id, val) { participants[id] = val; localStorage.setItem('jw_names_v48', JSON.stringify(participants)); }
-    function save() { localStorage.setItem('jw_timers_v48', JSON.stringify(timers)); localStorage.setItem('jw_parts_v48', JSON.stringify(meetingParts)); }
+    function saveName(id, val) { participants[id] = val; localStorage.setItem('jw_names_v49', JSON.stringify(participants)); }
+    function save() { localStorage.setItem('jw_timers_v49', JSON.stringify(timers)); localStorage.setItem('jw_parts_v49', JSON.stringify(meetingParts)); }
 
     function updateDisplay(id) {
         const p = meetingParts.find(x => x.id === id);
         if(!p) return;
+        
         const sec = timers[id].sec;
+        const metaSec = p.meta * 60;
         const el = document.getElementById(`disp-${id}`);
+        const card = document.getElementById(`card-${id}`);
         const prog = document.getElementById(`prog-${id}`);
+        
         if(el) el.innerText = formatTime(sec);
-        if(prog) {
-            const perc = Math.min((sec / (p.meta * 60)) * 100, 100);
+        
+        if(card && prog) {
+            const perc = Math.min((sec / metaSec) * 100, 100);
             prog.style.width = perc + "%";
-            prog.classList.toggle('progress-over', sec >= p.meta * 60);
+            
+            // Lógica do Semáforo
+            card.classList.remove('card-warning', 'card-danger');
+            prog.classList.remove('progress-warning', 'progress-over');
+
+            if(sec >= metaSec) {
+                card.classList.add('card-danger');
+                prog.classList.add('progress-over');
+            } else if (metaSec - sec <= 60) {
+                card.classList.add('card-warning');
+                prog.classList.add('progress-warning');
+            }
         }
     }
 
@@ -366,7 +396,7 @@
     function confirmDelete(id) { openModal("Remover?", "Excluir esta parte permanentemente?", () => { meetingParts = meetingParts.filter(p => p.id !== id); save(); render(); }); }
     function confirmResetPart(id) { openModal("Zerar?", "Reiniciar tempo desta parte?", () => { timers[id].sec = 0; timers[id].running = false; save(); render(); }); }
     function confirmResetAll(aba) { openModal("Zerar Tudo?", "Reiniciar todos os tempos desta aba?", () => { meetingParts.forEach(p => { if((aba==='fim' && p.container==='list-fim') || (aba==='meio' && p.container!=='list-fim')) { timers[p.id].sec=0; timers[p.id].running=false; } }); save(); render(); }); }
-    function confirmClearNames(aba) { openModal("Limpar Dados?", "Apagar todos os nomes e temas desta aba?", () => { meetingParts.forEach(p => { if((aba==='fim' && p.container==='list-fim') || (aba==='meio' && p.container!=='list-fim')) delete participants[p.id]; }); localStorage.setItem('jw_names_v48', JSON.stringify(participants)); render(); }); }
+    function confirmClearNames(aba) { openModal("Limpar Dados?", "Apagar todos os nomes e temas desta aba?", () => { meetingParts.forEach(p => { if((aba==='fim' && p.container==='list-fim') || (aba==='meio' && p.container!=='list-fim')) delete participants[p.id]; }); localStorage.setItem('jw_names_v49', JSON.stringify(participants)); render(); }); }
 
     function openHistory() {
         let body = history.length ? "" : "<p style='text-align:center; opacity:0.5'>Sem registros.</p>";
@@ -377,6 +407,7 @@
     function sendWhatsApp() {
         let txt = `*⏱️ TEMPO DAS PARTES*\n\n`;
         let resumo = "";
+        let temRegistro = false;
         
         const categories = [
             { id: 'acc-tesouros', label: 'TESOUROS' },
@@ -385,12 +416,9 @@
             { id: 'list-fim', label: 'REUNIÃO FDS' }
         ];
 
-        let temRegistro = false;
-
         categories.forEach(cat => {
             const partsInCat = meetingParts.filter(p => p.container.startsWith(cat.id));
             let catTxt = "";
-            
             partsInCat.forEach(p => {
                 if (timers[p.id].sec > 0) {
                     catTxt += `• ${p.nome}: *${formatTime(timers[p.id].sec)}*\n`;
@@ -398,10 +426,7 @@
                     temRegistro = true;
                 }
             });
-
-            if (catTxt) {
-                txt += `--- ${cat.label} ---\n${catTxt}\n`;
-            }
+            if (catTxt) txt += `--- ${cat.label} ---\n${catTxt}\n`;
         });
 
         if(!temRegistro) {
@@ -410,7 +435,7 @@
         }
 
         history.push({ data: new Date().toLocaleString(), resumo });
-        localStorage.setItem('jw_history_v48', JSON.stringify(history));
+        localStorage.setItem('jw_history_v49', JSON.stringify(history));
         window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(txt));
     }
 
