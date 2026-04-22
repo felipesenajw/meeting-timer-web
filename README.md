@@ -22,3 +22,33 @@ Este projeto foi desenhado como um **Web App**.
 1. Abra o link do GitHub Pages no seu navegador mobile.
 2. No Chrome (Android) ou Safari (iOS), selecione "Adicionar à Tela Inicial".
 3. O ícone aparecerá como um aplicativo nativo.
+
+## 🚀 Últimas Atualizações
+
+<details>
+<summary><b>Clique para conferir as novidades da Versão Atual – 2.1.1</b></summary>
+
+### 💡 Experiência de Uso (UX/UI)
+* **Barra de Navegação Unificada:** O botão **Compartilhar** agora reside na barra inferior, centralizando as ações e liberando mais espaço para os cronômetros.
+* **Modo de Edição Dinâmico:** Ao clicar em `Configurar`, o botão se transforma em um check de `Confirmar` (verde), indicando visualmente que você está em modo de ajuste.
+* **Indicador de Tela Ativa:** Um novo ícone de **lâmpada 💡** no rodapé acende sempre que o modo "Sempre Ligado" está operando.
+
+---
+
+### ⚙️ Funcionalidades e APIs
+* **📱 Screen Wake Lock API:** O sistema agora impede que o celular apague a tela automaticamente enquanto um cronômetro estiver rodando. Ao pausar, a tela é liberada para economizar bateria.
+* **📳 API de Vibração (Feedback Tátil):**
+    * **Vibração Curta (200ms):** Alerta quando falta exatamente **1 minuto** para atingir a meta.
+    * **Vibração Dupla (400ms):** Notifica quando o tempo da parte se **esgotou**.
+
+---
+
+### 📝 Relatórios e Compartilhamento
+* **Relatórios Segmentados:** O app agora é inteligente! Ele identifica se você está na aba "Meio de Semana" ou "Fim de Semana" e gera o relatório apenas da reunião atual.
+* **Organização por Marcadores:** As mensagens enviadas via WhatsApp agora contam com divisores visuais temáticos, facilitando a leitura de quem recebe:
+    * 💎 **TESOUROS**
+    * 🎤 **MINISTÉRIO**
+    * 🌳 **VIDA CRISTÃ**
+* **Novo Título:** Relatórios agora são identificados como `⏱️ TEMPO DAS PARTES`.
+
+</details>
