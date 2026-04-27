@@ -72,6 +72,7 @@
 
         .card-warning { background: rgba(255, 193, 7, 0.1) !important; border-color: var(--warning-color) !important; }
         .card-danger { background: rgba(220, 53, 69, 0.1) !important; border-color: var(--danger-color) !important; animation: pulse-danger 2s infinite; }
+        .text-danger { color: var(--danger-color) !important; font-weight: 800 !important; }
 
         @keyframes pulse-danger {
             0% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.2); }
@@ -87,8 +88,8 @@
         .running .status-dot { display: inline-block; animation: blink 1s infinite; }
         @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
 
-        .participant-input, .modal input { width: 100%; border: 1px solid transparent; border-radius: 12px; background: rgba(0,0,0,0.04); color: var(--text-color); font-size: 0.95rem; padding: 12px; outline: none; margin-top: 8px; }
-        [data-theme="dark"] .participant-input, [data-theme="dark"] .modal input { background: rgba(255,255,255,0.05); }
+        .participant-input, .modal input, .start-time-input { width: 100%; border: 1px solid transparent; border-radius: 12px; background: rgba(0,0,0,0.04); color: var(--text-color); font-size: 0.95rem; padding: 12px; outline: none; margin-top: 8px; }
+        [data-theme="dark"] .participant-input, [data-theme="dark"] .modal input, [data-theme="dark"] .start-time-input { background: rgba(255,255,255,0.05); }
         
         .timer-row { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; }
         .timer-display { font-size: 2.2rem; font-weight: 700; letter-spacing: -1px; cursor: pointer; }
@@ -108,6 +109,9 @@
         .config-mode .btn-add-part { display: flex; }
 
         .total-box { text-align: center; padding: 25px; background: var(--card-bg); border-radius: 24px; border: 1px solid var(--border-color); margin-top: 25px; }
+        .prediction-row { margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border-color); }
+        .start-time-input { width: 100px; text-align: center; margin: 5px auto; padding: 5px; font-weight: 700; color: var(--primary-color); }
+
         .action-area { margin-top: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .btn-footer-action { background: transparent; border: 1px solid var(--border-color); color: var(--text-color); padding: 14px; border-radius: 16px; font-weight: 700; cursor: pointer; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; gap: 6px; }
         .btn-danger-outline { border-color: var(--danger-color); color: var(--danger-color); }
@@ -134,14 +138,14 @@
 
     <div id="meio" class="content active">
         <div class="accordion">
-            <div class="accordion-header" style="background-color:var(--tesouros)" onclick="toggleAcc('acc-tesouros', this)">TESOUROS DA PALAVRA <span class="material-icons">expand_more</span></div>
+            <div class="accordion-header" style="background-color:var(--tesouros)" onclick="toggleAcc('acc-tesouros', this)">TESOUROS DA PALAVRA DE DEUS <span class="material-icons">expand_more</span></div>
             <div id="acc-tesouros-wrap" class="accordion-content">
                 <div id="acc-tesouros" class="sortable-list"></div>
                 <button class="btn-add-part" onclick="prepareAdd('acc-tesouros')"><span class="material-icons">add_circle</span> Nova Parte</button>
             </div>
         </div>
         <div class="accordion">
-            <div class="accordion-header" style="background-color:var(--ministerio)" onclick="toggleAcc('acc-ministerio', this)">FAÇA SEU MELHOR <span class="material-icons">expand_more</span></div>
+            <div class="accordion-header" style="background-color:var(--ministerio)" onclick="toggleAcc('acc-ministerio', this)">FAÇA SEU MELHOR NO MINISTÉRIO <span class="material-icons">expand_more</span></div>
             <div id="acc-ministerio-wrap" class="accordion-content">
                 <div id="acc-ministerio" class="sortable-list"></div>
                 <button class="btn-add-part" onclick="prepareAdd('acc-ministerio')"><span class="material-icons">add_circle</span> Nova Parte</button>
@@ -158,6 +162,12 @@
         <div class="total-box">
             <div style="font-size:0.7rem; font-weight:700; opacity:0.6; margin-bottom:5px">TEMPO TOTAL DA REUNIÃO</div>
             <span id="total-meio" style="font-size:3.5rem; font-weight:800; color:var(--primary-color)">00:00</span>
+            
+            <div class="prediction-row">
+                <div style="font-size:0.65rem; font-weight:700; opacity:0.5; text-transform: uppercase;">Início da Reunião</div>
+                <input type="time" class="start-time-input" id="start-meio" oninput="updateTotals()">
+                <div id="end-meio" style="font-size:1.1rem; font-weight:700; color:var(--success-color); margin-top:5px">Término previsto: --:--</div>
+            </div>
         </div>
         <div class="action-area">
             <button class="btn-footer-action btn-danger-outline" onclick="confirmResetAll('meio')"><span class="material-icons">timer_off</span> Zerar Tempo</button>
@@ -172,6 +182,12 @@
         <div class="total-box">
             <div style="font-size:0.7rem; font-weight:700; opacity:0.6; margin-bottom:5px">TEMPO TOTAL DA REUNIÃO</div>
             <span id="total-fim" style="font-size:3.5rem; font-weight:800; color:var(--primary-color)">00:00</span>
+
+            <div class="prediction-row">
+                <div style="font-size:0.65rem; font-weight:700; opacity:0.5; text-transform: uppercase;">Início da Reunião</div>
+                <input type="time" class="start-time-input" id="start-fim" oninput="updateTotals()">
+                <div id="end-fim" style="font-size:1.1rem; font-weight:700; color:var(--success-color); margin-top:5px">Término previsto: --:--</div>
+            </div>
         </div>
         <div class="action-area">
             <button class="btn-footer-action btn-danger-outline" onclick="confirmResetAll('fim')"><span class="material-icons">timer_off</span> Zerar Tempo</button>
@@ -200,13 +216,12 @@
 
 <script>
     let wakeLock = null;
-
     async function requestWakeLock() {
-        try { if ('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); } 
-        catch (err) { console.log(err); }
+        try { if ('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); } catch (err) {}
     }
 
     const defaultParts = [
+        { id: "fixed_inicio", nome: "Comentários iniciais", meta: 1, container: "acc-tesouros", cor: "color-tesouros" },
         { id: "p1", nome: "Tesouros da Palavra", meta: 10, container: "acc-tesouros", cor: "color-tesouros" },
         { id: "p2", nome: "Joias Espirituais", meta: 10, container: "acc-tesouros", cor: "color-tesouros" },
         { id: "p3", nome: "Leitura da Bíblia", meta: 4, container: "acc-tesouros", cor: "color-tesouros" },
@@ -215,15 +230,22 @@
         { id: "p6", nome: "Parte 3", meta: 5, container: "acc-ministerio", cor: "color-ministerio" },
         { id: "p7", nome: "Parte 1", meta: 15, container: "acc-vida", cor: "color-vida-crista" },
         { id: "p8", nome: "Estudo Bíblico", meta: 30, container: "acc-vida", cor: "color-vida-crista" },
+        { id: "fixed_fim", nome: "Comentários finais", meta: 3, container: "acc-vida", cor: "color-vida-crista" },
         { id: "p9", nome: "Discurso Público", meta: 30, container: "list-fim", cor: "color-fim" },
         { id: "p10", nome: "Estudo de A Sentinela", meta: 60, container: "list-fim", cor: "color-fim" }
     ];
 
     let meetingParts = JSON.parse(localStorage.getItem('jw_parts_v49')) || [...defaultParts];
+    
+    meetingParts = meetingParts.map(p => {
+        if(p.id === 'fixed_inicio') return { ...p, nome: "Comentários iniciais", cor: "color-tesouros", container: "acc-tesouros" };
+        if(p.id === 'fixed_fim') return { ...p, nome: "Comentários finais", cor: "color-vida-crista", container: "acc-vida" };
+        return p;
+    });
+
     let timers = JSON.parse(localStorage.getItem('jw_timers_v49')) || {};
     let participants = JSON.parse(localStorage.getItem('jw_names_v49')) || {};
     let history = JSON.parse(localStorage.getItem('jw_history_v49')) || [];
-    let currentTab = 'meio';
 
     function save() { 
         localStorage.setItem('jw_timers_v49', JSON.stringify(timers)); 
@@ -255,17 +277,23 @@
             const container = document.getElementById(p.container);
             if(!container) return;
             const isRunning = timers[p.id].running;
+            const isFixed = p.id.startsWith('fixed_');
+
             container.innerHTML += `
                 <div class="part-card ${p.cor} ${isRunning ? 'running' : ''}" id="card-${p.id}">
                     <div class="progress-bar" id="prog-${p.id}"></div>
-                    <button class="btn-config-action btn-delete" onclick="confirmDelete('${p.id}')"><span class="material-icons" style="font-size:18px">delete</span></button>
-                    <button class="btn-config-action btn-edit" onclick="openEditModal('${p.id}')"><span class="material-icons" style="font-size:18px">edit</span></button>
+                    ${!isFixed ? `
+                        <button class="btn-config-action btn-delete" onclick="confirmDelete('${p.id}')"><span class="material-icons" style="font-size:18px">delete</span></button>
+                        <button class="btn-config-action btn-edit" onclick="openEditModal('${p.id}')"><span class="material-icons" style="font-size:18px">edit</span></button>
+                    ` : ''}
                     <div class="drag-handle"><span class="material-icons" style="font-size:14px">drag_indicator</span> Arrastar</div>
                     <div class="main-content">
                         <div style="font-weight:700; font-size:0.75rem; opacity:0.6; display:flex; align-items:center">
                             ${p.nome} (${p.meta} min) <span class="status-dot"></span>
                         </div>
-                        <input type="text" class="participant-input" placeholder="Participante..." value="${participants[p.id] || ''}" oninput="saveName('${p.id}', this.value)">
+                        ${!isFixed ? `
+                            <input type="text" class="participant-input" placeholder="Participante..." value="${participants[p.id] || ''}" oninput="saveName('${p.id}', this.value)">
+                        ` : '<div style="margin-top:10px"></div>'}
                         <div class="timer-row">
                             <div class="timer-display" onclick="openAdjustModal('${p.id}')">
                                 <span id="disp-${p.id}">00:00</span>
@@ -282,44 +310,91 @@
         updateTotals();
     }
 
-    function confirmClearNames(aba) { 
-        openModal("Limpar Dados?", "Isso apagará os nomes dos participantes e restaurará os temas originais desta aba. Deseja continuar?", () => { 
-            meetingParts.forEach(p => { 
-                const isFim = p.container === 'list-fim';
-                // Verifica se a parte pertence à aba atual
-                if((aba === 'fim' && isFim) || (aba === 'meio' && !isFim)) {
-                    // 1. Limpa participante
-                    delete participants[p.id]; 
-                    
-                    // 2. Busca no padrão original pelo ID e restaura
-                    const original = defaultParts.find(d => d.id === p.id);
-                    if(original) {
-                        p.nome = original.nome;
-                        p.meta = original.meta;
-                    }
-                } 
-            }); 
-            // Salva tudo e recarrega a interface
-            save(); 
-            render(); 
-        }); 
+    function updateTotals() {
+        let sM = 0, sF = 0;
+        let metaM = 0, metaF = 0;
+        let saldoM = 0, saldoF = 0;
+
+        meetingParts.forEach(p => {
+            const s = timers[p.id].sec || 0;
+            const metaSec = p.meta * 60;
+            if(p.container === 'list-fim') {
+                sF += s; metaF += metaSec;
+                if(s > 0) saldoF += (s - metaSec);
+            } else {
+                sM += s; metaM += metaSec;
+                if(s > 0) saldoM += (s - metaSec);
+            }
+        });
+
+        document.getElementById('total-meio').innerText = formatTime(sM);
+        document.getElementById('total-fim').innerText = formatTime(sF);
+
+        const applyPrediction = (aba, totalMeta, saldo) => {
+            const input = document.getElementById(`start-${aba}`);
+            const display = document.getElementById(`end-${aba}`);
+            if(!input.value) { display.innerText = "Término previsto: --:--"; return; }
+            const [h, m] = input.value.split(':').map(Number);
+            const startMin = (h * 60) + m;
+            const finalMin = startMin + (totalMeta / 60) + (saldo / 60);
+            const fH = Math.floor(finalMin / 60) % 24;
+            const fM = Math.round(finalMin % 60);
+            display.innerText = `Término previsto: ${fH.toString().padStart(2,'0')}:${fM.toString().padStart(2,'0')}`;
+        };
+
+        applyPrediction('meio', metaM, saldoM);
+        applyPrediction('fim', metaF, saldoF);
+    }
+
+    function formatTime(s) { return `${Math.floor(s/60).toString().padStart(2,'0')}:${(s%60).toString().padStart(2,'0')}`; }
+    
+    function toggleTimer(id) {
+        const state = !timers[id].running;
+        if(state) { Object.keys(timers).forEach(k => timers[k].running = false); requestWakeLock(); }
+        timers[id].running = state; save(); render();
+    }
+
+    function updateDisplay(id) {
+        const p = meetingParts.find(x => x.id === id);
+        if(!p) return;
+        const sec = timers[id].sec;
+        const metaSec = p.meta * 60;
+        const el = document.getElementById(`disp-${id}`);
+        const card = document.getElementById(`card-${id}`);
+        const prog = document.getElementById(`prog-${id}`);
+        
+        if(el) el.innerText = formatTime(sec);
+        
+        if(card && prog) {
+            const perc = Math.min((sec / metaSec) * 100, 100);
+            prog.style.width = perc + "%";
+            
+            card.classList.remove('card-warning', 'card-danger');
+            prog.classList.remove('progress-warning', 'progress-over');
+            el.classList.remove('text-danger');
+
+            if(sec >= metaSec) { 
+                card.classList.add('card-danger'); 
+                prog.classList.add('progress-over');
+                el.classList.add('text-danger');
+            } else if (metaSec - sec <= 60) { 
+                // EXCEÇÃO: Ignorar amarelo se for o card fixo de 1 minuto
+                if(p.id !== 'fixed_inicio') {
+                    card.classList.add('card-warning'); 
+                    prog.classList.add('progress-warning'); 
+                }
+            }
+        }
     }
 
     function toggleTheme() {
-        const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        const current = document.documentElement.getAttribute('data-theme');
+        const next = current === 'dark' ? 'light' : 'dark';
         document.documentElement.setAttribute('data-theme', next);
         localStorage.setItem('jw_user_theme', next);
     }
 
-    function toggleConfig() { 
-        const isConfig = document.getElementById('body').classList.toggle('config-mode');
-        document.getElementById('config-icon').innerText = isConfig ? 'check_circle' : 'tune';
-        document.getElementById('btn-config-nav').classList.toggle('active-mode', isConfig);
-        render();
-    }
-
     function switchTab(t) {
-        currentTab = t;
         document.querySelectorAll('.content, .tab').forEach(e => e.classList.remove('active'));
         document.getElementById(t).classList.add('active');
         document.getElementById(`tab-btn-${t}`).classList.add('active');
@@ -331,6 +406,15 @@
         el.querySelector('.material-icons').innerText = content.classList.contains('open') ? 'expand_less' : 'expand_more';
     }
 
+    function saveName(id, val) { participants[id] = val; localStorage.setItem('jw_names_v49', JSON.stringify(participants)); }
+
+    function toggleConfig() { 
+        const isConfig = document.getElementById('body').classList.toggle('config-mode');
+        document.getElementById('config-icon').innerText = isConfig ? 'check_circle' : 'tune';
+        document.getElementById('btn-config-nav').classList.toggle('active-mode', isConfig);
+        render();
+    }
+
     function openModal(title, body, confirmFn, showCancel = true) {
         document.getElementById('modalTitle').innerText = title;
         document.getElementById('modalBody').innerHTML = body;
@@ -340,50 +424,8 @@
         document.getElementById('modalConfirmBtn').onclick = () => { if(confirmFn) confirmFn(); closeModal(); };
         document.getElementById('customModal').style.display = 'flex';
     }
+
     function closeModal() { document.getElementById('customModal').style.display = 'none'; }
-
-    function saveName(id, val) { participants[id] = val; localStorage.setItem('jw_names_v49', JSON.stringify(participants)); }
-
-    function updateDisplay(id) {
-        const p = meetingParts.find(x => x.id === id);
-        if(!p) return;
-        const sec = timers[id].sec;
-        const metaSec = p.meta * 60;
-        const el = document.getElementById(`disp-${id}`);
-        const card = document.getElementById(`card-${id}`);
-        const prog = document.getElementById(`prog-${id}`);
-        if(el) el.innerText = formatTime(sec);
-        if(card && prog) {
-            const perc = Math.min((sec / metaSec) * 100, 100);
-            prog.style.width = perc + "%";
-            card.classList.remove('card-warning', 'card-danger');
-            prog.classList.remove('progress-warning', 'progress-over');
-            if(sec >= metaSec) { card.classList.add('card-danger'); prog.classList.add('progress-over'); }
-            else if (metaSec - sec <= 60) { card.classList.add('card-warning'); prog.classList.add('progress-warning'); }
-        }
-    }
-
-    function updateTotals() {
-        let sM = 0, sF = 0;
-        meetingParts.forEach(p => {
-            const s = timers[p.id].sec || 0;
-            if(p.container === 'list-fim') sF += s; else sM += s;
-        });
-        document.getElementById('total-meio').innerText = formatTime(sM);
-        document.getElementById('total-fim').innerText = formatTime(sF);
-    }
-    
-    function formatTime(s) { return `${Math.floor(s/60).toString().padStart(2,'0')}:${(s%60).toString().padStart(2,'0')}`; }
-
-    function toggleTimer(id) {
-        const state = !timers[id].running;
-        if(state) {
-            Object.keys(timers).forEach(k => timers[k].running = false);
-            requestWakeLock();
-        }
-        timers[id].running = state;
-        save(); render();
-    }
 
     function openAdjustModal(id) {
         openModal("Ajustar Tempo", `<label>Minutos Totais</label><input type="number" id="adjM" placeholder="Ex: 5">`, () => {
@@ -413,6 +455,19 @@
     function confirmDelete(id) { openModal("Remover?", "Excluir esta parte permanentemente?", () => { meetingParts = meetingParts.filter(p => p.id !== id); save(); render(); }); }
     function confirmResetPart(id) { openModal("Zerar?", "Reiniciar tempo desta parte?", () => { timers[id].sec = 0; timers[id].running = false; save(); render(); }); }
     function confirmResetAll(aba) { openModal("Zerar Tudo?", "Reiniciar todos os tempos desta aba?", () => { meetingParts.forEach(p => { if((aba==='fim' && p.container==='list-fim') || (aba==='meio' && p.container!=='list-fim')) { timers[p.id].sec=0; timers[p.id].running=false; } }); save(); render(); }); }
+
+    function confirmClearNames(aba) { 
+        openModal("Limpar Dados?", "Apagar nomes e restaurar temas originais desta aba?", () => { 
+            meetingParts.forEach(p => { 
+                if((aba==='fim' && p.container==='list-fim') || (aba==='meio' && p.container!=='list-fim')) {
+                    delete participants[p.id]; 
+                    const defaultP = defaultParts.find(d => d.id === p.id);
+                    if(defaultP) { p.nome = defaultP.nome; p.meta = defaultP.meta; }
+                } 
+            }); 
+            save(); render(); 
+        }); 
+    }
 
     function openHistory() {
         let body = history.length ? "" : "<p style='text-align:center; opacity:0.5'>Sem registros.</p>";
@@ -449,9 +504,9 @@
         });
     }, 1000);
 
-    // Iniciar tema
     const savedTheme = localStorage.getItem('jw_user_theme');
     if (savedTheme) document.documentElement.setAttribute('data-theme', savedTheme);
+    else if (window.matchMedia('(prefers-color-scheme: dark)').matches) document.documentElement.setAttribute('data-theme', 'dark');
 
     render();
 </script>
