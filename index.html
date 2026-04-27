@@ -204,7 +204,7 @@
     <button class="nav-item" onclick="sendWhatsApp()" style="color:var(--success-color)"><span class="material-icons">share</span>Enviar</button>
 </nav>
 
-<canvas id="pipCanvas" width="300" height="150"></canvas>
+<canvas id="pipCanvas" width="300" height="200"></canvas>
 <video id="pipVideo" autoplay muted playsinline loop></video>
 <audio id="silentAudio" loop><source src="data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAAAA==" type="audio/wav"></audio>
 
@@ -245,7 +245,6 @@
 
     let meetingParts = JSON.parse(localStorage.getItem('jw_parts_v49')) || [...defaultParts];
     
-    // Auto-correção estrutural
     meetingParts = meetingParts.map(p => {
         if(p.id === 'fixed_inicio') return { ...p, nome: "Comentários iniciais", cor: "color-tesouros", container: "acc-tesouros" };
         if(p.id === 'fixed_fim') return { ...p, nome: "Comentários finais", cor: "color-vida-crista", container: "acc-vida" };
@@ -353,6 +352,26 @@
         }
     }
 
+    function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+        const words = text.split(' ');
+        let line = '';
+        let currentY = y;
+        for (let n = 0; n < words.length; n++) {
+            let testLine = line + words[n] + ' ';
+            let metrics = ctx.measureText(testLine);
+            let testWidth = metrics.width;
+            if (testWidth > maxWidth && n > 0) {
+                ctx.fillText(line, x, currentY);
+                line = words[n] + ' ';
+                currentY += lineHeight;
+            } else {
+                line = testLine;
+            }
+        }
+        ctx.fillText(line, x, currentY);
+        return currentY;
+    }
+
     function updatePiPCanvas() {
         if (!pipSessionActive || !currentActiveId) return;
         const canvas = document.getElementById('pipCanvas');
@@ -361,18 +380,27 @@
         const sec = timers[currentActiveId].sec;
         const metaSec = p.meta * 60;
         const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-        ctx.fillStyle = isDark ? "#1a1a1a" : "#ffffff"; ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = isDark ? "#bbbbbb" : "#666666"; ctx.font = "bold 20px Ubuntu, sans-serif"; ctx.textAlign = "center";
-        ctx.fillText(p.nome.toUpperCase(), canvas.width / 2, 40);
+        ctx.fillStyle = isDark ? "#1a1a1a" : "#ffffff";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = isDark ? "#bbbbbb" : "#666666";
+        ctx.font = "bold 18px Ubuntu, sans-serif";
+        ctx.textAlign = "center";
+        const lastY = wrapText(ctx, p.nome.toUpperCase(), canvas.width / 2, 35, 260, 22);
         ctx.fillStyle = (sec >= metaSec) ? "#dc3545" : (isDark ? "#ffffff" : "#2d3436");
-        ctx.font = "bold 75px Ubuntu, sans-serif"; ctx.fillText(formatTime(sec), canvas.width / 2, 115);
+        ctx.font = "bold 75px Ubuntu, sans-serif";
+        ctx.fillText(formatTime(sec), canvas.width / 2, lastY + 80);
     }
 
     function toggleTimer(id) {
         const state = !timers[id].running;
-        if(state) { Object.keys(timers).forEach(k => timers[k].running = false); requestWakeLock(); if(pipSessionActive) currentActiveId = id; }
-        timers[id].running = state; save(); render();
-        if(pipSessionActive) updateMediaMetadata();
+        if(state) {
+            Object.keys(timers).forEach(k => timers[k].running = false);
+            requestWakeLock();
+            if(pipSessionActive) currentActiveId = id; 
+        }
+        timers[id].running = state;
+        save(); render();
+        if(pipSessionActive) { updateMediaMetadata(); updatePiPCanvas(); }
     }
 
     function formatTime(s) { return `${Math.floor(s/60).toString().padStart(2,'0')}:${(s%60).toString().padStart(2,'0')}`; }
@@ -416,23 +444,19 @@
     function switchTab(t) { document.querySelectorAll('.content, .tab').forEach(e => e.classList.remove('active')); document.getElementById(t).classList.add('active'); document.getElementById(`tab-btn-${t}`).classList.add('active'); }
     function toggleAcc(id, el) { const c = document.getElementById(id + '-wrap'); c.classList.toggle('open'); el.querySelector('.material-icons').innerText = c.classList.contains('open') ? 'expand_less' : 'expand_more'; }
     function saveName(id, val) { participants[id] = val; save(); }
+    function toggleConfig() { const isConfig = document.getElementById('body').classList.toggle('config-mode'); document.getElementById('config-icon').innerText = isConfig ? 'check_circle' : 'tune'; document.getElementById('btn-config-nav').classList.toggle('active-mode', isConfig); render(); }
     
-    function toggleConfig() { 
-        const isConfig = document.getElementById('body').classList.toggle('config-mode');
-        document.getElementById('config-icon').innerText = isConfig ? 'check_circle' : 'tune';
-        document.getElementById('btn-config-nav').classList.toggle('active-mode', isConfig);
-        render(); 
-    }
-
     function openModal(title, body, confirmFn, showCancel = true) {
         document.getElementById('modalTitle').innerText = title;
         document.getElementById('modalBody').innerHTML = body;
         const cancelBtn = document.getElementById('modalCancelBtn');
         cancelBtn.style.display = showCancel ? 'block' : 'none';
+        document.getElementById('modalConfirmBtn').innerText = showCancel ? "Confirmar" : "OK";
         document.getElementById('modalConfirmBtn').onclick = () => { if(confirmFn) confirmFn(); closeModal(); };
         document.getElementById('customModal').style.display = 'flex';
     }
     function closeModal() { document.getElementById('customModal').style.display = 'none'; }
+
     function openAdjustModal(id) { openModal("Ajustar Tempo", `<input type="number" id="adjM" placeholder="Minutos">`, () => { const v = parseInt(document.getElementById('adjM').value); if(!isNaN(v)){timers[id].sec=v*60; save(); render();} }); }
     function prepareAdd(containerId) { openModal("Nova Parte", `<input type="text" id="newN" placeholder="Nome"><input type="number" id="newM" placeholder="Meta">`, () => { const id="p_"+Date.now(); let cor=containerId.includes('tesouros')?'color-tesouros':(containerId.includes('ministerio')?'color-ministerio':(containerId.includes('vida')?'color-vida-crista':'color-fim')); meetingParts.push({id, nome:document.getElementById('newN').value||"Nova Parte", meta:parseInt(document.getElementById('newM').value)||5, container:containerId, cor}); save(); render(); }); }
     function openEditModal(id) { const p=meetingParts.find(x=>x.id===id); openModal("Editar", `<input type="text" id="editN" value="${p.nome}"><input type="number" id="editM" value="${p.meta}">`, () => { p.nome=document.getElementById('editN').value; p.meta=parseInt(document.getElementById('editM').value); save(); render(); }); }
@@ -441,15 +465,26 @@
     function confirmResetAll(aba) { openModal("Zerar Tudo?", "Reiniciar tempos?", () => { meetingParts.forEach(p=>{ if((aba==='fim'&&p.container==='list-fim')||(aba==='meio'&&p.container!=='list-fim')){timers[p.id].sec=0; timers[p.id].running=false;} }); save(); render(); }); }
     function confirmClearNames(aba) { openModal("Limpar Dados?", "Apagar nomes?", () => { meetingParts.forEach(p=>{ if((aba==='fim'&&p.container==='list-fim')||(aba==='meio'&&p.container!=='list-fim')){ delete participants[p.id]; const d=defaultParts.find(x=>x.id===p.id); if(d) p.nome=d.nome; } }); save(); render(); }); }
     function openHistory() { let b=history.length?"":"Sem registros."; history.slice().reverse().slice(0,10).forEach(h=>{ b+=`<div style="border-bottom:1px solid var(--border-color); padding:5px 0">${h.data}<br>${h.resumo}</div>`; }); openModal("Histórico", b, null, false); }
+    
     function sendWhatsApp() {
-        let t=`*Relatório de Tempo*\n\n`, r="", ok=false;
+        let t=`*⏱️ RELATÓRIO DE TEMPO*\n\n`, r="", ok=false;
         [{id:'acc-tesouros',l:'TESOUROS'},{id:'acc-ministerio',l:'MINISTÉRIO'},{id:'acc-vida',l:'VIDA CRISTÃ'},{id:'list-fim',l:'FIM DE SEMANA'}].forEach(c=>{
             const ps=meetingParts.filter(p=>p.container.startsWith(c.id)); let ct="";
-            ps.forEach(p=>{ if(timers[p.id].sec>0){ ct+=`• ${p.nome}: *${formatTime(timers[p.id].sec)}*\n`; r+=`${p.nome}:${formatTime(timers[p.id].sec)}|`; ok=true; } });
+            ps.forEach(p=>{ if(timers[p.id].sec > 0){ 
+                const pName = participants[p.id] ? `(${participants[p.id]})` : "";
+                ct+=`• ${p.nome} ${pName}: *${formatTime(timers[p.id].sec)}*\n`; r+=`${p.nome}:${formatTime(timers[p.id].sec)}|`; ok=true; 
+            } });
             if(ct) t+=`*${c.l}*\n${ct}\n`;
         });
-        if(!ok) return alert("Inicie um cronômetro!");
-        history.push({data:new Date().toLocaleString(), resumo:r}); save(); window.open("https://api.whatsapp.com/send?text="+encodeURIComponent(t));
+        
+        if(!ok) {
+            openModal("Aviso", "Inicie um cronômetro primeiro!", null, false);
+            return;
+        }
+
+        history.push({data:new Date().toLocaleString(), resumo:r}); 
+        save();
+        window.open("https://api.whatsapp.com/send?text="+encodeURIComponent(t));
     }
 
     setInterval(() => { Object.keys(timers).forEach(id => { if(timers[id].running) { timers[id].sec++; updateDisplay(id); updateTotals(); } }); }, 1000);
