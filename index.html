@@ -56,28 +56,25 @@
         .content { display: none; }
         .content.active { display: block; }
 
-        /* Accordion */
         .accordion { margin-bottom: 15px; border-radius: 20px; overflow: hidden; border: 1px solid var(--border-color); background: var(--card-bg); }
         .accordion-header { padding: 16px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; color: white; font-weight: 700; font-size: 0.85rem; }
         .accordion-content { display: none; padding: 12px; }
         .accordion-content.open { display: block; }
 
-        /* Card Visuals & Semaphores */
         .part-card { 
             background: var(--card-bg); border: 1px solid var(--border-color); padding: 18px; border-radius: 18px; margin-bottom: 12px; 
-            border-left: 8px solid #ccc; position: relative; overflow: hidden; transition: background 0.5s, border-color 0.5s;
+            border-left: 8px solid #ccc; position: relative; overflow: hidden; transition: all 0.4s ease;
         }
         .color-tesouros { border-left-color: var(--tesouros); }
         .color-ministerio { border-left-color: var(--ministerio); }
         .color-vida-crista { border-left-color: var(--vida-crista); }
         .color-fim { border-left-color: var(--primary-color); }
 
-        /* Estados do Semáforo */
-        .card-warning { background: rgba(255, 193, 7, 0.15) !important; border-color: var(--warning-color) !important; }
-        .card-danger { background: rgba(220, 53, 69, 0.15) !important; border-color: var(--danger-color) !important; animation: pulse-danger 1.5s infinite; }
+        .card-warning { background: rgba(255, 193, 7, 0.1) !important; border-color: var(--warning-color) !important; }
+        .card-danger { background: rgba(220, 53, 69, 0.1) !important; border-color: var(--danger-color) !important; animation: pulse-danger 2s infinite; }
 
         @keyframes pulse-danger {
-            0% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.4); }
+            0% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.2); }
             70% { box-shadow: 0 0 0 10px rgba(220, 53, 69, 0); }
             100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
         }
@@ -92,12 +89,12 @@
 
         .participant-input, .modal input { width: 100%; border: 1px solid transparent; border-radius: 12px; background: rgba(0,0,0,0.04); color: var(--text-color); font-size: 0.95rem; padding: 12px; outline: none; margin-top: 8px; }
         [data-theme="dark"] .participant-input, [data-theme="dark"] .modal input { background: rgba(255,255,255,0.05); }
-        .modal label { font-size: 0.75rem; font-weight: 700; opacity: 0.6; display: block; margin-top: 15px; text-transform: uppercase; }
-
+        
         .timer-row { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; }
         .timer-display { font-size: 2.2rem; font-weight: 700; letter-spacing: -1px; cursor: pointer; }
 
-        .icon-btn { border: none; width: 48px; height: 48px; border-radius: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: white; }
+        .icon-btn { border: none; width: 48px; height: 48px; border-radius: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: white; transition: transform 0.1s; }
+        .icon-btn:active { transform: scale(0.9); }
         .btn-play { background: var(--primary-color); }
         .btn-pause { background: var(--danger-color); }
 
@@ -202,12 +199,12 @@
 </div>
 
 <script>
-    function initTheme() {
-        const savedTheme = localStorage.getItem('jw_user_theme');
-        if (savedTheme) document.documentElement.setAttribute('data-theme', savedTheme);
-        else if (window.matchMedia('(prefers-color-scheme: dark)').matches) document.documentElement.setAttribute('data-theme', 'dark');
+    let wakeLock = null;
+
+    async function requestWakeLock() {
+        try { if ('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); } 
+        catch (err) { console.log(err); }
     }
-    initTheme();
 
     const defaultParts = [
         { id: "p1", nome: "Tesouros da Palavra", meta: 10, container: "acc-tesouros", cor: "color-tesouros" },
@@ -227,6 +224,12 @@
     let participants = JSON.parse(localStorage.getItem('jw_names_v49')) || {};
     let history = JSON.parse(localStorage.getItem('jw_history_v49')) || [];
     let currentTab = 'meio';
+
+    function save() { 
+        localStorage.setItem('jw_timers_v49', JSON.stringify(timers)); 
+        localStorage.setItem('jw_parts_v49', JSON.stringify(meetingParts)); 
+        localStorage.setItem('jw_names_v49', JSON.stringify(participants));
+    }
 
     function render() {
         const isConfig = document.getElementById('body').classList.contains('config-mode');
@@ -279,6 +282,29 @@
         updateTotals();
     }
 
+    function confirmClearNames(aba) { 
+        openModal("Limpar Dados?", "Isso apagará os nomes dos participantes e restaurará os temas originais desta aba. Deseja continuar?", () => { 
+            meetingParts.forEach(p => { 
+                const isFim = p.container === 'list-fim';
+                // Verifica se a parte pertence à aba atual
+                if((aba === 'fim' && isFim) || (aba === 'meio' && !isFim)) {
+                    // 1. Limpa participante
+                    delete participants[p.id]; 
+                    
+                    // 2. Busca no padrão original pelo ID e restaura
+                    const original = defaultParts.find(d => d.id === p.id);
+                    if(original) {
+                        p.nome = original.nome;
+                        p.meta = original.meta;
+                    }
+                } 
+            }); 
+            // Salva tudo e recarrega a interface
+            save(); 
+            render(); 
+        }); 
+    }
+
     function toggleTheme() {
         const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
         document.documentElement.setAttribute('data-theme', next);
@@ -317,35 +343,23 @@
     function closeModal() { document.getElementById('customModal').style.display = 'none'; }
 
     function saveName(id, val) { participants[id] = val; localStorage.setItem('jw_names_v49', JSON.stringify(participants)); }
-    function save() { localStorage.setItem('jw_timers_v49', JSON.stringify(timers)); localStorage.setItem('jw_parts_v49', JSON.stringify(meetingParts)); }
 
     function updateDisplay(id) {
         const p = meetingParts.find(x => x.id === id);
         if(!p) return;
-        
         const sec = timers[id].sec;
         const metaSec = p.meta * 60;
         const el = document.getElementById(`disp-${id}`);
         const card = document.getElementById(`card-${id}`);
         const prog = document.getElementById(`prog-${id}`);
-        
         if(el) el.innerText = formatTime(sec);
-        
         if(card && prog) {
             const perc = Math.min((sec / metaSec) * 100, 100);
             prog.style.width = perc + "%";
-            
-            // Lógica do Semáforo
             card.classList.remove('card-warning', 'card-danger');
             prog.classList.remove('progress-warning', 'progress-over');
-
-            if(sec >= metaSec) {
-                card.classList.add('card-danger');
-                prog.classList.add('progress-over');
-            } else if (metaSec - sec <= 60) {
-                card.classList.add('card-warning');
-                prog.classList.add('progress-warning');
-            }
+            if(sec >= metaSec) { card.classList.add('card-danger'); prog.classList.add('progress-over'); }
+            else if (metaSec - sec <= 60) { card.classList.add('card-warning'); prog.classList.add('progress-warning'); }
         }
     }
 
@@ -363,7 +377,10 @@
 
     function toggleTimer(id) {
         const state = !timers[id].running;
-        if(state) Object.keys(timers).forEach(k => timers[k].running = false);
+        if(state) {
+            Object.keys(timers).forEach(k => timers[k].running = false);
+            requestWakeLock();
+        }
         timers[id].running = state;
         save(); render();
     }
@@ -396,7 +413,6 @@
     function confirmDelete(id) { openModal("Remover?", "Excluir esta parte permanentemente?", () => { meetingParts = meetingParts.filter(p => p.id !== id); save(); render(); }); }
     function confirmResetPart(id) { openModal("Zerar?", "Reiniciar tempo desta parte?", () => { timers[id].sec = 0; timers[id].running = false; save(); render(); }); }
     function confirmResetAll(aba) { openModal("Zerar Tudo?", "Reiniciar todos os tempos desta aba?", () => { meetingParts.forEach(p => { if((aba==='fim' && p.container==='list-fim') || (aba==='meio' && p.container!=='list-fim')) { timers[p.id].sec=0; timers[p.id].running=false; } }); save(); render(); }); }
-    function confirmClearNames(aba) { openModal("Limpar Dados?", "Apagar todos os nomes e temas desta aba?", () => { meetingParts.forEach(p => { if((aba==='fim' && p.container==='list-fim') || (aba==='meio' && p.container!=='list-fim')) delete participants[p.id]; }); localStorage.setItem('jw_names_v49', JSON.stringify(participants)); render(); }); }
 
     function openHistory() {
         let body = history.length ? "" : "<p style='text-align:center; opacity:0.5'>Sem registros.</p>";
@@ -405,35 +421,23 @@
     }
 
     function sendWhatsApp() {
-        let txt = `*⏱️ TEMPO DAS PARTES*\n\n`;
-        let resumo = "";
-        let temRegistro = false;
-        
-        const categories = [
-            { id: 'acc-tesouros', label: 'TESOUROS' },
-            { id: 'acc-ministerio', label: 'MINISTÉRIO' },
-            { id: 'acc-vida', label: 'VIDA CRISTÃ' },
-            { id: 'list-fim', label: 'REUNIÃO FDS' }
-        ];
-
+        let txt = `*⏱️ RELATÓRIO DE TEMPO*\n\n`;
+        let resumo = ""; let temRegistro = false;
+        const categories = [{ id: 'acc-tesouros', label: 'TESOUROS' }, { id: 'acc-ministerio', label: 'MINISTÉRIO' }, { id: 'acc-vida', label: 'VIDA CRISTÃ' }, { id: 'list-fim', label: 'FIM DE SEMANA' }];
         categories.forEach(cat => {
             const partsInCat = meetingParts.filter(p => p.container.startsWith(cat.id));
             let catTxt = "";
             partsInCat.forEach(p => {
                 if (timers[p.id].sec > 0) {
-                    catTxt += `• ${p.nome}: *${formatTime(timers[p.id].sec)}*\n`;
+                    const pName = participants[p.id] ? `(${participants[p.id]})` : "";
+                    catTxt += `• ${p.nome} ${pName}: *${formatTime(timers[p.id].sec)}*\n`;
                     resumo += `${p.nome}: ${formatTime(timers[p.id].sec)} | `;
                     temRegistro = true;
                 }
             });
-            if (catTxt) txt += `--- ${cat.label} ---\n${catTxt}\n`;
+            if (catTxt) txt += `*${cat.label}*\n${catTxt}\n`;
         });
-
-        if(!temRegistro) {
-            openModal("Aviso", "Inicie algum cronômetro primeiro para poder enviar o relatório!", null, false);
-            return;
-        }
-
+        if(!temRegistro) { openModal("Aviso", "Inicie algum cronômetro primeiro!", null, false); return; }
         history.push({ data: new Date().toLocaleString(), resumo });
         localStorage.setItem('jw_history_v49', JSON.stringify(history));
         window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(txt));
@@ -441,13 +445,13 @@
 
     setInterval(() => {
         Object.keys(timers).forEach(id => {
-            if(timers[id].running) {
-                timers[id].sec++;
-                updateDisplay(id);
-                updateTotals();
-            }
+            if(timers[id].running) { timers[id].sec++; updateDisplay(id); updateTotals(); }
         });
     }, 1000);
+
+    // Iniciar tema
+    const savedTheme = localStorage.getItem('jw_user_theme');
+    if (savedTheme) document.documentElement.setAttribute('data-theme', savedTheme);
 
     render();
 </script>
